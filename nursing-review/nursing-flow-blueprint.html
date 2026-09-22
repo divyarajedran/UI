@@ -1,0 +1,535 @@
+<title>Nursing Flow Blueprint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --sunk:#eceff4; --ink:#172033; --ink2:#4a556b; --ink3:#7a8499;
+  --line:#d9dee7; --navy:#233b77; --navy-soft:#e3e8f4;
+  --ok:#17804f; --ok-bg:#e2f3ea; --warn:#9a6200; --warn-bg:#fbf0d9; --bad:#b3261e; --bad-bg:#fbe5e3; --info:#2b5fb3; --info-bg:#e3ecfa;
+  --phone:#0f1629; --screen:#f4f6fb;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif; --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1420; --surface:#171e2d; --sunk:#1e2638; --ink:#e7ebf3; --ink2:#b3bccd; --ink3:#8792a8; --line:#2c3549; --navy:#8fa8e8; --navy-soft:#223055;
+  --ok:#5fcf97; --ok-bg:#15352a; --warn:#e8b457; --warn-bg:#3a2d12; --bad:#f08a80; --bad-bg:#3d1c1a; --info:#86aef0; --info-bg:#1c2c4a; --phone:#05070d; --screen:#eef1f8;
+}}
+:root[data-theme="dark"]{
+  --bg:#0f1420; --surface:#171e2d; --sunk:#1e2638; --ink:#e7ebf3; --ink2:#b3bccd; --ink3:#8792a8; --line:#2c3549; --navy:#8fa8e8; --navy-soft:#223055;
+  --ok:#5fcf97; --ok-bg:#15352a; --warn:#e8b457; --warn-bg:#3a2d12; --bad:#f08a80; --bad-bg:#3d1c1a; --info:#86aef0; --info-bg:#1c2c4a; --phone:#05070d; --screen:#eef1f8;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);margin:0}
+.wrap{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:28px 80px}
+h1,h2,h3{font-family:var(--serif);font-weight:650;text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:clamp(30px,5vw,44px)} h2{font-size:28px;margin-bottom:6px} h3{font-size:18px;font-family:var(--sans);font-weight:700}
+p{margin:0} .muted{color:var(--ink2)} .small{font-size:13px}
+code,.mono{font-family:var(--mono);font-size:12.5px}
+code{background:var(--sunk);padding:1px 5px;border-radius:4px;word-break:break-word}
+.eyebrow{font:600 12px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--navy)}
+header.top{display:grid;gap:14px;padding-bottom:26px;border-bottom:1px solid var(--line)}
+header.top .lede{max-width:70ch;color:var(--ink2);font-size:16.5px}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+nav.toc a{font-size:13px;color:var(--ink);text-decoration:none;border:1px solid var(--line);padding:5px 11px;border-radius:99px;background:var(--surface)}
+nav.toc a:hover,nav.toc a:focus-visible{border-color:var(--navy);color:var(--navy);outline:none}
+section{padding-top:48px;display:grid;gap:18px}
+.intro{max-width:72ch;color:var(--ink2)}
+.verdicts{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.verdict{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:6px;align-content:start}
+.verdict b{font-size:15px}
+.pill{display:inline-flex;align-items:center;gap:5px;font:600 11.5px/1 var(--sans);padding:4px 8px;border-radius:99px;white-space:nowrap;width:max-content}
+.ok{color:var(--ok);background:var(--ok-bg)} .warn{color:var(--warn);background:var(--warn-bg)} .bad{color:var(--bad);background:var(--bad-bg)} .info{color:var(--info);background:var(--info-bg)}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--ink2)}
+/* flow lanes */
+.flow{display:grid;gap:10px;counter-reset:step}
+.lane{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px}
+.lane-h{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline}
+.steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.step{counter-increment:step;border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:6px;align-content:start;background:var(--bg);position:relative}
+.step::before{content:counter(step);font:600 11px/1 var(--mono);color:var(--ink3)}
+.step b{font-size:14px;line-height:1.3}
+.step p{font-size:12.5px;color:var(--ink2);line-height:1.45}
+.step.s-ok{border-left:3px solid var(--ok)} .step.s-warn{border-left:3px solid var(--warn)} .step.s-bad{border-left:3px solid var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:13.5px}
+th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font:600 11.5px/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);background:var(--sunk);position:sticky;top:0}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600}
+td .sub{display:block;font-weight:400;color:var(--ink3);font-size:12px;margin-top:3px}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:10px;align-content:start}
+ul.clean{margin:0;padding-left:18px;display:grid;gap:6px}
+ul.clean li{padding-left:2px}
+ol.gaps{margin:0;padding:0;list-style:none;display:grid;gap:8px;counter-reset:g}
+ol.gaps li{counter-increment:g;display:grid;grid-template-columns:34px 1fr;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px}
+ol.gaps li::before{content:counter(g,decimal-leading-zero);font:600 13px/1.5 var(--mono);color:var(--bad)}
+/* scenario */
+.scenario{background:var(--navy-soft);border-radius:14px;padding:22px;display:grid;gap:14px}
+.scn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.scn{background:var(--surface);border-radius:10px;padding:14px;display:grid;gap:6px;border:1px solid var(--line)}
+.floorbar{display:flex;gap:6px;flex-wrap:wrap}
+.floor{font:600 12px/1 var(--mono);padding:7px 10px;border-radius:6px;border:1px dashed var(--line);color:var(--ink3)}
+.floor.on{border:1px solid var(--ok);background:var(--ok-bg);color:var(--ok)}
+/* decision diagram */
+.decide{display:grid;gap:8px}
+.dnode{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;display:grid;gap:4px}
+.dnode .q{font-weight:700}
+.darrow{font:500 12px/1 var(--mono);color:var(--ink3);padding-left:18px}
+.branch{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:620px){.branch{grid-template-columns:1fr}}
+/* phones */
+.phones{display:flex;gap:22px;overflow-x:auto;padding:6px 2px 18px;scroll-snap-type:x mandatory}
+.ph{flex:0 0 250px;scroll-snap-align:start;display:grid;gap:10px;align-content:start}
+.ph-cap{font-size:13px;color:var(--ink2);line-height:1.45}
+.ph-cap b{color:var(--ink);display:block;font-size:14px}
+.device{background:var(--phone);border-radius:30px;padding:9px;box-shadow:0 10px 30px -12px rgba(15,22,41,.45)}
+.scr{background:var(--screen);border-radius:22px;height:500px;overflow:hidden;display:flex;flex-direction:column;color:#172033;font:12px/1.4 var(--sans)}
+.sb{display:flex;justify-content:space-between;padding:8px 16px 4px;font:600 10.5px/1 var(--sans);color:#172033}
+.ab{background:#233b77;color:#fff;padding:10px 14px 12px;display:grid;gap:2px}
+.ab .t{font:700 14px/1.2 var(--sans)} .ab .s{font-size:10.5px;opacity:.8}
+.body{padding:10px 12px;display:grid;gap:8px;align-content:start;flex:1;overflow:hidden}
+.m-card{background:#fff;border-radius:10px;padding:10px;display:grid;gap:5px;border:1px solid #dfe4ee}
+.m-row{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.m-lbl{font-size:10px;color:#6b7590;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.m-chip{font:600 9.5px/1 var(--sans);padding:3px 6px;border-radius:99px;background:#e3e8f4;color:#233b77}
+.m-chip.g{background:#e2f3ea;color:#17804f} .m-chip.r{background:#fbe5e3;color:#b3261e} .m-chip.a{background:#fbf0d9;color:#9a6200}
+.m-btn{background:#233b77;color:#fff;border-radius:9px;padding:10px;text-align:center;font-weight:700;font-size:12px}
+.m-btn.ghost{background:#fff;color:#233b77;border:1px solid #233b77}
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.m-field{background:#fff;border:1px solid #d5dbe7;border-radius:8px;padding:6px 8px;display:grid;gap:1px}
+.m-field .v{font:600 14px/1.2 var(--mono);color:#172033}
+.m-field .v.hi{color:#b3261e}
+.m-tabs{display:flex;gap:4px;overflow:hidden}
+.m-tab{font-size:10px;font-weight:600;padding:5px 7px;border-radius:6px;background:#fff;border:1px solid #dfe4ee;white-space:nowrap;color:#4a556b}
+.m-tab.on{background:#233b77;color:#fff;border-color:#233b77}
+.navb{display:flex;justify-content:space-around;border-top:1px solid #dfe4ee;background:#fff;padding:7px 4px 9px;font-size:9.5px;color:#7a8499;font-weight:600}
+.navb span.on{color:#233b77}
+.scanbox{margin:6px auto;width:170px;height:170px;border-radius:14px;background:#0f1629;position:relative;display:grid;place-items:center}
+.scanbox::before{content:"";position:absolute;inset:24px;border:2px solid #7fe0b0;border-radius:10px}
+.scanbox::after{content:"";position:absolute;left:30px;right:30px;top:50%;height:2px;background:#7fe0b0;box-shadow:0 0 12px #7fe0b0}
+.qr{width:80px;height:80px;background:
+ conic-gradient(from 90deg at 30% 30%,#fff 0 25%,transparent 0) 0 0/16px 16px,
+ repeating-linear-gradient(90deg,#fff 0 4px,transparent 4px 9px),#0f1629;opacity:.85;border-radius:4px}
+.deny{margin:8px auto 0;width:62px;height:62px;border-radius:50%;background:#fbe5e3;color:#b3261e;display:grid;place-items:center;font:700 30px/1 var(--sans)}
+.bar{height:6px;border-radius:99px;background:#e3e8f4;overflow:hidden}
+.bar i{display:block;height:100%;background:#17804f}
+.doc-mini{border-left:3px solid #233b77}
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--ink3)}
+a{color:var(--navy)}
+@media (prefers-reduced-motion:no-preference){.scanbox::after{animation:scan 2.2s ease-in-out infinite}@keyframes scan{0%,100%{top:30%}50%{top:70%}}}
+</style>
+
+<div class="wrap">
+<nav aria-label="Documents" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px">
+  <a href="nursing-flow-blueprint.html" style="font-size:13px;text-decoration:none;padding:6px 12px;border-radius:8px;background:var(--navy);color:var(--surface)">1 · Blueprint</a>
+  <a href="nursing-gaps-and-apis.html" style="font-size:13px;text-decoration:none;padding:6px 12px;border-radius:8px;border:1px solid var(--line);color:var(--ink2);background:var(--surface)">2 · Gaps &amp; API spec</a>
+  <a href="nurse-mobile-prototype.html" style="font-size:13px;text-decoration:none;padding:6px 12px;border-radius:8px;border:1px solid var(--line);color:var(--ink2);background:var(--surface)">3 · Nurse app (mobile)</a>
+  <a href="doctor-console-web.html" style="font-size:13px;text-decoration:none;padding:6px 12px;border-radius:8px;border:1px solid var(--line);color:var(--ink2);background:var(--surface)">4 · Doctor console (web)</a>
+  <a href="doctor-mobile-prototype.html" style="font-size:13px;text-decoration:none;padding:6px 12px;border-radius:8px;border:1px solid var(--line);color:var(--ink2);background:var(--surface)">5 · Doctor app (mobile)</a>
+</nav>
+<header class="top">
+  <span class="eyebrow">HMS · Nursing · Current state and mobile design · 21 Sep 2026</span>
+  <h1>Nursing Flow Blueprint</h1>
+  <p class="lede">How nursing works today in the web HMS (<code>Healthcare Management System</code>) and in the Flutter <code>DoctorApp</code>, what reaches the doctor and what doesn't, and a design for a floor-locked, QR-scan nursing flow in the mobile app.</p>
+  <nav class="toc" aria-label="Sections">
+    <a href="#summary">Summary</a><a href="#op">OP flow</a><a href="#ip">IP flow</a><a href="#visibility">Nurse ↔ Doctor</a><a href="#nutrition">Nutrition</a><a href="#compare">Web vs App</a><a href="#gaps">Gaps</a><a href="#design">Mobile design</a><a href="#screens">Screens</a><a href="#build">Build plan</a>
+  </nav>
+</header>
+
+<!-- SUMMARY -->
+<section id="summary">
+  <span class="eyebrow">Summary</span>
+  <h2>Summary: a nursing module exists, but floor access isn't enforced</h2>
+  <p class="intro">The web app has a large Nursing Automation module with 45 API actions: OP nurse queue, task board, medication administration, ward workspace, duty roster, handover and reports. Real usage is low (for example, 110 nursing tasks and 7 OP queue rows in the audit). Floor and ward allocation is only a UI default. The server doesn't enforce it, and there's no bed QR code.</p>
+  <div class="verdicts">
+    <div class="verdict"><span class="pill ok">Works</span><b>IP vitals, nursing notes and I/O reach the doctor</b><p class="small muted">They are shared tables, visible on the IP timeline, the case sheet and the IP EMR in both web and app.</p></div>
+    <div class="verdict"><span class="pill warn">Partly</span><b>Medicines given are visible, but only in the nurse console</b><p class="small muted">Doctors see the MAR only when they open the shared <code>nurse_console</code> page. It isn't on the timeline or the doctor workspace.</p></div>
+    <div class="verdict"><span class="pill bad">Doubtful</span><b>OP queue vitals probably don't reach the doctor's case sheet</b><p class="small muted">The OP queue writes <code>vitals_monitoring</code>, but the case sheet reads the visit-report path. Needs a DB check.</p></div>
+    <div class="verdict"><span class="pill bad">Missing</span><b>Floor-locked access and bed QR scanning</b><p class="small muted">Roster floor/ward data exists, but no screen or API blocks a nurse from other floors. There's no bed QR (the only QR is the food-ordering one).</p></div>
+    <div class="verdict"><span class="pill warn">Split</span><b>IP nutrition data sits in the external MOP F&amp;B service</b><p class="small muted">Diet orders live in HMS, but consumption %, calories and protein are stored only in MOP. The doctor never sees them.</p></div>
+    <div class="verdict"><span class="pill warn">Partly</span><b>Nurses see medicine orders, but not the doctor's full summary</b><p class="small muted">Prescriptions are visible in the nurse console. Doctor notes, investigations and instructions require opening the EMR timeline.</p></div>
+  </div>
+  <div class="legend"><span class="pill ok">Exists &amp; wired</span><span class="pill warn">Partial / split / buggy</span><span class="pill bad">Missing or not wired</span><span class="pill info">Inferred (SP body not in repo)</span></div>
+</section>
+
+<!-- OP -->
+<section id="op">
+  <span class="eyebrow">Outpatient</span>
+  <h2>OP nursing flow today</h2>
+  <p class="intro">There are two parallel ways to record OP vitals, and they store data in different places. That's why doctor visibility depends on which one the nurse used.</p>
+  <div class="flow">
+    <div class="lane">
+      <div class="lane-h"><h3>Path A: Dashboard "Nurse Initial Assessment" (classic)</h3><span class="pill ok">Doctor sees vitals</span></div>
+      <div class="steps">
+        <div class="step s-ok"><b>Appointment list</b><p>Dashboard grid, <code>SP_G_Appointment_Request</code>. No token or triage.</p></div>
+        <div class="step s-ok"><b>Check-in</b><p><code>Patient_checkin</code> → <code>SP_D_Patient_checkin</code></p></div>
+        <div class="step s-ok"><b>Vitals + assessment</b><p>Quick Entry modal: vitals, sugar, HbA1c, allergies, pain, fall risk, psychosocial, nutritional screening.</p></div>
+        <div class="step s-ok"><b>Doctor case sheet</b><p><code>CaseSheetSelect</code> reads vitals, VAS and fall risk. Allergies, arrival time, psychosocial and substance-use answers are <em>not</em> shown to the doctor.</p></div>
+        <div class="step s-bad"><b>Post-consult nursing</b><p>No task, queue or record for injections, dressings or procedures.</p></div>
+      </div>
+    </div>
+    <div class="lane">
+      <div class="lane-h"><h3>Path B: OP Nurse Queue (Nursing Automation)</h3><span class="pill bad">Doctor visibility doubtful</span></div>
+      <div class="steps">
+        <div class="step s-warn"><b>Add to queue</b><p>Manual "Add to Queue" modal only, issues a token. Check-in doesn't add patients. 7 rows total.</p></div>
+        <div class="step s-ok"><b>WAITING → VITALS_IN_PROGRESS</b><p><code>OPQueueStatusUpdate</code> (Start Vitals)</p></div>
+        <div class="step s-warn"><b>Vitals entry → VITALS_DONE</b><p><code>SP_OPVitalsEntry_NurseQueue</code>. <code>blood_sugar_type</code> is dropped, and <code>nurse_id</code> is null because nurses have no DoctorId cookie.</p></div>
+        <div class="step s-ok"><b>WITH_DOCTOR → COMPLETED</b><p>Send to Doctor. NO_SHOW and CANCELLED are possible from any open state.</p></div>
+        <div class="step s-bad"><b>Doctor reads vitals?</b><p>These vitals are stored in <code>vitals_monitoring</code>, which the case sheet doesn't read. <span class="pill info">Inferred</span></p></div>
+      </div>
+    </div>
+    <div class="lane">
+      <div class="lane-h"><h3>DoctorApp (Flutter) OP</h3><span class="pill warn">Mirrors Path B</span></div>
+      <div class="steps">
+        <div class="step s-ok"><b>OP Queue tab</b><p>Doctor cards → token list (<code>nurse_op_queue_page.dart</code>)</p></div>
+        <div class="step s-warn"><b>OP Vitals</b><p><code>nurse_op_vitals_page.dart</code>: BP, pulse, temperature, SpO2, weight, height, RR. No blood sugar and no range checks. <code>visit_report_id</code> is set to the appointment id.</p></div>
+        <div class="step s-bad"><b>Doctor consult in app</b><p>Reads <code>CaseStudy/Patient_General_Information</code>, which isn't linked to <code>OPVitalsEntry</code>.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IP -->
+<section id="ip">
+  <span class="eyebrow">Inpatient</span>
+  <h2>IP nursing flow today (web)</h2>
+  <p class="intro">This is the full lifecycle, from admission to discharge. Each step shows its status, and green means data lands in tables the doctor timeline reads.</p>
+  <div class="flow">
+    <div class="lane">
+      <div class="lane-h"><h3>Admission and allocation</h3></div>
+      <div class="steps">
+        <div class="step s-ok"><b>Admission request</b><p>The doctor fills in <code>instructionToNurse</code>. It's only visible again if the admit form is reopened.</p></div>
+        <div class="step s-ok"><b>Admit + bed</b><p><code>SP_AdmitPatient_Ins_Upd_Sel</code>: ward and bed. Nurse name is free text.</p></div>
+        <div class="step s-warn"><b>Admission tasks</b><p>Task GENERATE fires twice (client and server), so duplicates are possible.</p></div>
+        <div class="step s-warn"><b>Duty roster</b><p><code>nursing_duty_roster</code>: nurse, floor, ward, shift, standing roster. Used as a <em>default filter</em> only.</p></div>
+      </div>
+    </div>
+    <div class="lane">
+      <div class="lane-h"><h3>Daily care (per shift)</h3></div>
+      <div class="steps">
+        <div class="step s-ok"><b>Vitals charting</b><p><code>ip_vitalsmonitoring_details</code>: pulse, BP, CVP, RR, SpO2, FiO2, temperature, VAS. Also written from the MAR "administer" step.</p></div>
+        <div class="step s-ok"><b>Medication administration</b><p><code>nurse_console</code>: doses generated from <code>medicine_prescription</code> at 08/14/18/20 h, only once pharmacy has dispensed. Statuses: GIVEN, REFUSED, NPO, SKIPPED, DELAYED.</p></div>
+        <div class="step s-warn"><b>Second MAR path</b><p>Medication Delivery page: DELIVERED/ADMINISTERED statuses, wardid null → page empty.</p></div>
+        <div class="step s-ok"><b>Intake / output</b><p><code>ipfluids</code>: IV, oral, TPN, blood; urine, drain, vomit, RTA; balance.</p></div>
+        <div class="step s-ok"><b>Diabetic chart</b><p>8 slots (FBS, PPBS, RBS, pre/post meals, 3 AM).</p></div>
+        <div class="step s-warn"><b>Nursing notes</b><p><code>ip_nursing_notes</code>: free text only, no shift or category.</p></div>
+        <div class="step s-warn"><b>Tasks board</b><p>NurseConsolePro and Worklist. Overdue auto-escalation and order-triggered tasks aren't wired, and photo/vitals completion isn't captured.</p></div>
+        <div class="step s-warn"><b>Diet</b><p>IP Diet V2 orders go to MOP F&amp;B. Consumption stays in MOP. The legacy diet-delivery table has 0 rows.</p></div>
+      </div>
+    </div>
+    <div class="lane">
+      <div class="lane-h"><h3>Shift end and exit</h3></div>
+      <div class="steps">
+        <div class="step s-bad"><b>Shift handover</b><p>Save only: per-patient notes are lost (<code>[object Object]</code>), nurse ids are 0, and there's no read or acknowledge screen.</p></div>
+        <div class="step s-warn"><b>Bed transfer</b><p>Transfer order generates transfer tasks.</p></div>
+        <div class="step s-ok"><b>Discharge</b><p>Workflow 'FD' step generates discharge tasks. The summary uses admission vitals only.</p></div>
+        <div class="step s-bad"><b>Care plan, Braden/Morse, IP fall risk</b><p>Missing. The ICU nursing assessment page is static HTML and can't save.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VISIBILITY -->
+<section id="visibility">
+  <span class="eyebrow">Nurse ↔ Doctor</span>
+  <h2>What the nurse enters vs what the doctor sees</h2>
+  <p class="intro">This checks both directions. Column 3 is the web doctor view, column 4 is the Flutter doctor view.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Nurse enters</th><th>Stored in</th><th>Doctor – web</th><th>Doctor – Flutter app</th></tr></thead>
+    <tbody>
+      <tr><td>IP vitals</td><td><code>ip_vitalsmonitoring_details</code></td><td><span class="pill ok">Timeline, nurse console, workspace</span></td><td><span class="pill ok">EMR vitals list + verify</span></td></tr>
+      <tr><td>Nursing notes</td><td><code>ip_nursing_notes</code></td><td><span class="pill ok">Timeline</span></td><td><span class="pill ok">EMR nursing notes</span></td></tr>
+      <tr><td>Intake / output</td><td><code>Fluids</code></td><td><span class="pill ok">Timeline "IV Fluids"</span></td><td><span class="pill ok">EMR IV fluids</span></td></tr>
+      <tr><td>Diabetic chart</td><td><code>Diabeticchart</code></td><td><span class="pill ok">Timeline</span></td><td><span class="pill ok">EMR</span></td></tr>
+      <tr><td>Medicines given (MAR)<span class="sub">GIVEN / REFUSED / NPO…</span></td><td><code>medication_delivery_schedule</code></td><td><span class="pill warn">Only inside nurse_console</span></td><td><span class="pill bad">Not shown</span></td></tr>
+      <tr><td>Task completion</td><td><code>nursing_task_completion</code></td><td><span class="pill warn">Only the Task Board tab</span></td><td><span class="pill bad">Not shown</span></td></tr>
+      <tr><td>Diet consumption / kcal</td><td>MOP F&amp;B (external)</td><td><span class="pill bad">Not shown</span></td><td><span class="pill bad">Not shown</span></td></tr>
+      <tr><td>Shift handover</td><td><code>shift_handover</code></td><td><span class="pill bad">No read screen</span></td><td><span class="pill bad">Not shown</span></td></tr>
+      <tr><td>OP vitals (Dashboard quick entry)</td><td>visit report</td><td><span class="pill ok">Case sheet</span></td><td><span class="pill ok">Consult vitals</span></td></tr>
+      <tr><td>OP vitals (nurse queue / app)</td><td><code>vitals_monitoring</code></td><td><span class="pill bad">Probably not</span></td><td><span class="pill bad">Probably not</span></td></tr>
+      <tr><td>OP allergies, psychosocial, arrival time</td><td>quick entry</td><td><span class="pill bad">Not on case sheet</span></td><td><span class="pill bad">Not shown</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="cols2">
+    <div class="card"><h3>What nurses can see of doctor orders</h3>
+      <ul class="clean">
+        <li><span class="pill ok">Yes</span> Medicine orders (dose, frequency, taper, instructions, doctor name, allergy check) in <code>nurse_console</code></li>
+        <li><span class="pill ok">Yes</span> Diagnosis and last vitals on worklist and ward cards</li>
+        <li><span class="pill warn">Hidden</span> Doctor notes, investigations and instructions: the nurse must open the EMR timeline</li>
+        <li><span class="pill bad">No</span> Lab/investigation orders as nursing tasks (<code>GENERATE_ORDER</code> is never called)</li>
+        <li><span class="pill bad">No</span> Flutter nurse app can't open prescriptions or the EMR. It only has medication rows and the "assigned by doctor" name.</li>
+      </ul>
+    </div>
+    <div class="card"><h3>What this means for mobile</h3>
+      <ul class="clean">
+        <li>Write vitals to <code>Vitalsmonitoring</code>, and write MAR through the <b>nurse_console administer</b> path. That's the path the doctor reads, and it also copies vitals.</li>
+        <li>Don't use the automation <code>MedicationDeliveryUpdate</code> path (the one the app uses today). Its status vocabulary differs and nothing mirrors it to the doctor.</li>
+        <li>Add a "Nursing" tab to the doctor's IP patient screen showing MAR, tasks, diet and handover.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- NUTRITION -->
+<section id="nutrition">
+  <span class="eyebrow">Nutrition</span>
+  <h2>Nutrition and diet: three separate systems</h2>
+  <div class="cols2">
+    <div class="card"><span class="pill ok">OP · doctor</span><h3>Diet &amp; exercise plan</h3><p class="small muted"><code>diet_excercise</code>: goal duration, kcal, food type, servings, instructions. Plus nutritional screening flags (appetite, weight loss) and "observed nutrition".</p></div>
+    <div class="card"><span class="pill warn">IP · V2</span><h3>IP Diet V2 (current)</h3><p class="small muted"><code>IpDietPrescription</code>: diet type, texture, portion, meal timings, instructions. Orders go to <b>MOP F&amp;B</b>. Consumption %, taste, calories, protein and nutritional risk are stored <em>only in MOP</em>.</p></div>
+    <div class="card"><span class="pill bad">IP · legacy</span><h3>Diet delivery tracking</h3><p class="small muted"><code>diet_delivery_tracking</code> has 0 rows because its generator has no caller. The DietDelivery page and the Flutter Diet tab read this table, so both are always empty.</p></div>
+  </div>
+  <p class="intro small">Recommendation: mobile shows the V2 diet order (read) and records consumption to MOP <em>and</em> to a local HMS mirror, so the doctor view can show "Ate 50% of lunch · 1,150 of 1,800 kcal today".</p>
+</section>
+
+<!-- COMPARE -->
+<section id="compare">
+  <span class="eyebrow">Web vs Flutter</span>
+  <h2>Web HMS vs DoctorApp nursing</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Capability</th><th>Web HMS</th><th>Flutter DoctorApp</th></tr></thead>
+    <tbody>
+      <tr><td>Nurse role / landing</td><td><span class="pill warn">No role flag</span> Same dashboard for everyone; "nurse" is guessed from the role name (3 different rules)</td><td><span class="pill warn">Substring match</span> "nurse" / "superintendent" → Nurse or NS dashboard</td></tr>
+      <tr><td>Floor/ward scoping</td><td><span class="pill warn">UI default only</span> Roster → location → all</td><td><span class="pill bad">None</span> <code>wardid: null</code> in every call</td></tr>
+      <tr><td>Bed QR scan</td><td><span class="pill bad">None</span></td><td><span class="pill bad">None</span> no scanner package</td></tr>
+      <tr><td>OP queue + vitals</td><td><span class="pill ok">Yes</span> two paths</td><td><span class="pill ok">Yes</span> queue path only</td></tr>
+      <tr><td>IP vitals entry</td><td><span class="pill ok">Yes</span> vitals page, console, workspace (Quick Vitals broken)</td><td><span class="pill warn">Doctor EMR only</span> not in the nurse app</td></tr>
+      <tr><td>Medication administration</td><td><span class="pill ok">nurse_console</span> + automation page</td><td><span class="pill warn">Automation path</span> hospital-wide, no per-patient MAR</td></tr>
+      <tr><td>I/O, diabetic chart, notes</td><td><span class="pill ok">Yes</span></td><td><span class="pill warn">Doctor EMR only</span> (I/O save not awaited)</td></tr>
+      <tr><td>Diet</td><td><span class="pill warn">V2 via MOP</span></td><td><span class="pill bad">Legacy table</span> always empty</td></tr>
+      <tr><td>Tasks</td><td><span class="pill ok">Console Pro, Worklist, board</span></td><td><span class="pill warn">List + complete</span> no vitals/photo form</td></tr>
+      <tr><td>Roster / templates / reports</td><td><span class="pill ok">Yes</span></td><td><span class="pill ok">NS app</span></td></tr>
+      <tr><td>Shift handover</td><td><span class="pill bad">Broken save</span></td><td><span class="pill bad">None</span></td></tr>
+      <tr><td>Doctor's summary for nurse</td><td><span class="pill warn">Rx only</span> in console</td><td><span class="pill bad">None</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- GAPS -->
+<section id="gaps">
+  <span class="eyebrow">Gaps</span>
+  <h2>Gaps to fix before (or while) building mobile</h2>
+  <ol class="gaps">
+    <li><div><b>No server-side access control by location.</b> <span class="muted">Any nurse can read and write any patient. The mobile QR lock must be enforced by the API, not by the app.</span></div></li>
+    <li><div><b>Nurse identity is lost on writes.</b> <span class="muted"><code>nurse_id</code> comes from the DoctorId cookie, which is null for nurses. Every mobile write needs <code>nurse_user_id</code> taken from the token.</span></div></li>
+    <li><div><b>Two MAR status vocabularies and two write paths.</b> <span class="muted">Standardize on the nurse_console path.</span></div></li>
+    <li><div><b>OP queue vitals don't reach the case sheet</b> <span class="muted">(inferred). Confirm in the DB, then have <code>SP_OPVitalsEntry_NurseQueue</code> also write the visit-report vitals.</span></div></li>
+    <li><div><b>Handover is broken, and overdue/escalation jobs aren't wired.</b> <span class="muted">Fix the save, add acknowledgement, and schedule <code>CHECK_OVERDUE</code>.</span></div></li>
+    <li><div><b>Diet consumption exists only in MOP.</b> <span class="muted">Mirror it into HMS so doctors and reports can see it.</span></div></li>
+    <li><div><b>Display board API is public.</b> <span class="muted">It has no <code>[Authorize]</code> and returns patient names, beds and vitals.</span></div></li>
+  </ol>
+</section>
+
+<!-- DESIGN -->
+<section id="design">
+  <span class="eyebrow">Proposal · Flutter nursing flow</span>
+  <h2>Mobile nursing flow: floor-locked QR access</h2>
+  <div class="scenario">
+    <p><b>Scenario (example data).</b> Staff Nurse Priya is rostered on the Morning shift (06:00–14:00) for <b>3rd and 4th floor</b>. Every bed has a printed QR label.</p>
+    <div class="floorbar" aria-label="Floor allocation"><span class="floor">G</span><span class="floor">1F</span><span class="floor">2F</span><span class="floor on">3F ✓</span><span class="floor on">4F ✓</span><span class="floor">5F</span></div>
+    <div class="scn-grid">
+      <div class="scn"><span class="pill bad">Denied</span><b>Scans 2F · Ward A · Bed 01</b><p class="small muted">"Access denied: this bed is on 2nd floor. You're allotted 3F and 4F this shift." The scan is logged. The nurse can request temporary cover from the charge nurse.</p></div>
+      <div class="scn"><span class="pill ok">Allowed</span><b>Scans 3F · Ward B · Bed 07</b><p class="small muted">The patient chart opens with name, UHID, age, allergies and diagnosis, with tabs for Vitals, Meds due, MAR, I/O, Nutrition, Notes, Tasks and Doctor summary.</p></div>
+      <div class="scn"><span class="pill info">Round trip</span><b>Doctor sees it immediately</b><p class="small muted">Vitals, MAR, notes and I/O go into the same tables the doctor reads. Diet consumption is mirrored. The doctor's IP screen gains a Nursing tab.</p></div>
+    </div>
+  </div>
+
+  <div class="cols2">
+    <div class="card">
+      <h3>How the access check works (server-side)</h3>
+      <div class="decide">
+        <div class="dnode"><span class="m-lbl" style="color:var(--ink3)">Input</span><span class="q">App sends <code>POST /api/NurseMobile/ScanBed</code> with the QR token and a bearer JWT</span></div>
+        <div class="darrow">↓ decode token → bed_id (verify HMAC)</div>
+        <div class="dnode"><span class="q">Resolve bed → ward → floor</span><span class="small muted"><code>bed_managemet_details</code> → <code>ward_management_details.floorid</code></span></div>
+        <div class="darrow">↓ nurse_user_id from JWT, never from the request body</div>
+        <div class="dnode"><span class="q">Is there an active roster row for this nurse now, covering this floor or ward?</span><span class="small muted"><code>nursing_duty_roster</code>: duty_date or standing range, shift window, floorid/wardid/current_wardid, PUBLISHED. Plus approved temporary cover.</span></div>
+        <div class="branch">
+          <div class="dnode" style="border-color:var(--bad)"><span class="pill bad">No → 403</span><span class="small">Returns the reason, the nurse's allotted floors and the charge nurse on that floor. Logs <code>DENIED</code>.</span></div>
+          <div class="dnode" style="border-color:var(--ok)"><span class="pill ok">Yes → 200</span><span class="small">Returns the patient on that bed (<code>visit_reportid</code>) and a short-lived <b>bed-access grant</b> (valid until shift end). Logs <code>GRANTED</code>.</span></div>
+        </div>
+        <div class="darrow">↓ every write carries the grant</div>
+        <div class="dnode"><span class="q">Every write API re-checks the grant against visit_reportid</span><span class="small muted">This stops someone from calling the vitals or MAR API for a 2F patient directly.</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Design decisions</h3>
+      <ul class="clean">
+        <li><b>QR payload:</b> <code>HMSBED:v1:{bedId}:{hmac}</code>. Contains no patient data, so a label on the wall reveals nothing. The label is reprinted only when the bed id changes.</li>
+        <li><b>The bed QR stays fixed while patients change:</b> the server looks up the current occupant at scan time, so transfers and discharges need no relabelling.</li>
+        <li><b>Empty bed:</b> "Bed 07 is vacant". Transferred patient: "Patient moved to 4F-12", which opens only if 4F is allotted.</li>
+        <li><b>Floor list is also the home screen:</b> nurses can browse their floors' census without scanning, but writes on the MAR step require a scan (a bedside check).</li>
+        <li><b>Charge nurse / NS:</b> a role flag gives read-all access. Writes still follow the roster, or use an explicit "cover" assignment.</li>
+        <li><b>Shift end:</b> grants expire, and the app prompts for the handover.</li>
+        <li><b>Offline:</b> vitals and notes queue locally with their timestamp. MAR writes must be online (to prevent double dosing).</li>
+        <li><b>Phase 2:</b> add a patient wristband scan and a medicine barcode check (right patient, right drug).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENS -->
+<section id="screens">
+  <span class="eyebrow">UI · 9 screens</span>
+  <h2>Screen flow (mockups)</h2>
+  <p class="intro small">Scroll sideways. Colours follow DoctorApp's <code>AppColors.primary #233B77</code>. Build on the existing <code>AppShell</code>, <code>AppCard</code>, <code>AppTextField</code> and <code>PrimaryButton</code>.</p>
+  <div class="phones">
+
+    <div class="ph"><div class="device"><div class="scr">
+      <div class="sb"><span>07:12</span><span>●●● 5G</span></div>
+      <div class="ab"><span class="t">Good morning, Priya</span><span class="s">Staff Nurse · Morning 06:00–14:00</span></div>
+      <div class="body">
+        <div class="m-card"><span class="m-lbl">Allotted this shift</span><div class="m-row"><span class="m-chip g">3rd floor · 18 beds</span><span class="m-chip g">4th floor · 14 beds</span></div></div>
+        <div class="m-btn">⌗  Scan bed QR</div>
+        <div class="m-grid">
+          <div class="m-card"><span class="m-lbl">Meds due</span><b style="font-size:18px">12</b><span class="m-chip r">3 overdue</span></div>
+          <div class="m-card"><span class="m-lbl">Vitals due</span><b style="font-size:18px">9</b><span class="m-chip a">next 30 min</span></div>
+          <div class="m-card"><span class="m-lbl">Tasks</span><b style="font-size:18px">7</b><span class="m-chip">2 high</span></div>
+          <div class="m-card"><span class="m-lbl">New orders</span><b style="font-size:18px">4</b><span class="m-chip">from doctors</span></div>
+        </div>
+      </div>
+      <div class="navb"><span class="on">Home</span><span>Floors</span><span>Scan</span><span>Tasks</span><span>Me</span></div>
+    </div></div><p class="ph-cap"><b>1 · Home</b>Shows the allotted floors from the roster, today's workload, and one large Scan button.</p></div>
+
+    <div class="ph"><div class="device"><div class="scr">
+      <div class="sb"><span>07:15</span><span>●●● 5G</span></div>
+      <div class="ab"><span class="t">3rd floor · Ward B</span><span class="s">18 beds · 16 occupied</span></div>
+      <div class="body">
+        <div class="m-tabs"><span class="m-tab on">3F</span><span class="m-tab">4F</span><span class="m-tab">Due now</span><span class="m-tab">Critical</span></div>
+        <div class="m-card"><div class="m-row"><b>B-07 · R. Kumar, 62M</b><span class="m-chip r">Med overdue</span></div><span style="color:#6b7590">Pneumonia · Dr. Arjun · Day 3</span></div>
+        <div class="m-card"><div class="m-row"><b>B-08 · S. Devi, 45F</b><span class="m-chip a">Vitals due</span></div><span style="color:#6b7590">Post-op lap chole · Day 1</span></div>
+        <div class="m-card"><div class="m-row"><b>B-09 · Vacant</b><span class="m-chip">Clean</span></div></div>
+        <div class="m-card"><div class="m-row"><b>B-10 · M. Iqbal, 71M</b><span class="m-chip g">On track</span></div><span style="color:#6b7590">CHF · NPO after 22:00</span></div>
+      </div>
+      <div class="navb"><span>Home</span><span class="on">Floors</span><span>Scan</span><span>Tasks</span><span>Me</span></div>
+    </div></div><p class="ph-cap"><b>2 · Floor census</b>Only allotted floors appear. Each bed shows a status chip, and tapping a bed prompts a scan before any write.</p></div>
+
+    <div class="ph"><div class="device"><div class="scr" style="background:#0f1629;color:#fff">
+      <div class="sb" style="color:#fff"><span>07:18</span><span>●●● 5G</span></div>
+      <div class="body" style="text-align:center;gap:12px">
+        <b style="font-size:14px">Scan the bed QR label</b>
+        <div class="scanbox"><div class="qr"></div></div>
+        <span style="opacity:.75">Point at the label on the bed head-board</span>
+        <div class="m-btn ghost" style="background:transparent;color:#fff;border-color:#fff">Enter bed code manually</div>
+        <span style="opacity:.6;font-size:10.5px">Torch · Recent: 3F-B07, 3F-B08</span>
+      </div>
+    </div></div><p class="ph-cap"><b>3 · Scanner</b>Uses <code>mobile_scanner</code>. The manual code fallback goes through the same server check.</p></div>
+
+    <div class="ph"><div class="device"><div class="scr">
+      <div class="sb"><span>07:19</span><span>●●● 5G</span></div>
+      <div class="body" style="text-align:center;padding-top:26px;gap:10px">
+        <div class="deny">!</div>
+        <b style="font-size:16px">Access denied</b>
+        <span style="color:#4a556b">2nd floor · Ward A · Bed 01 isn't in your allocation.</span>
+        <div class="m-card" style="text-align:left"><span class="m-lbl">You're allotted</span><div class="m-row"><span class="m-chip g">3rd floor</span><span class="m-chip g">4th floor</span><span></span></div><span class="m-lbl" style="margin-top:4px">2F charge nurse</span><span>Sr. Meena · ext 2204</span></div>
+        <div class="m-btn">Request temporary cover</div>
+        <div class="m-btn ghost">Scan another bed</div>
+        <span style="font-size:10px;color:#7a8499">This attempt has been logged.</span>
+      </div>
+    </div></div><p class="ph-cap"><b>4 · Denied</b>Shows why access was denied and who to contact. A cover request goes to the charge nurse, whose approval adds a temporary grant.</p></div>
+
+    <div class="ph"><div class="device"><div class="scr">
+      <div class="sb"><span>07:21</span><span>●●● 5G</span></div>
+      <div class="ab"><span class="t">R. Kumar · 62 M</span><span class="s">3F-B07 · UHID 204518 · IP Day 3</span></div>
+      <div class="body">
+        <div class="m-row"><span class="m-chip r">Allergy: Penicillin</span><span class="m-chip a">Fall risk</span><span class="m-chip">Diet: Soft</span></div>
+        <div class="m-tabs"><span class="m-tab on">Overview</span><span class="m-tab">Vitals</span><span class="m-tab">MAR</span><span class="m-tab">I/O</span><span class="m-tab">Diet</span></div>
+        <div class="m-card"><div class="m-row"><span class="m-lbl">Due now</span><span class="m-chip r">1 overdue</span></div><div class="m-row"><span>Inj. Ceftriaxone 1 g IV</span><b>08:00</b></div><div class="m-row"><span>Vitals (4-hourly)</span><b>08:00</b></div></div>
+        <div class="m-card"><span class="m-lbl">Last vitals · 04:00</span><div class="m-row mono" style="font-size:11px"><span>BP 132/84</span><span>P 96</span><span>T 38.2°</span><span>SpO₂ 93%</span></div></div>
+        <div class="m-card doc-mini"><span class="m-lbl">Doctor summary · Dr. Arjun · 06:40</span><span>Continue IV antibiotics. O₂ to keep SpO₂ &gt; 94%. Repeat CBC today. Notify if T &gt; 38.5°.</span></div>
+      </div>
+      <div class="navb"><span>Home</span><span>Floors</span><span class="on">Patient</span><span>Tasks</span><span>Me</span></div>
+    </div></div><p class="ph-cap"><b>5 · Patient hub</b>Opens after an allowed scan. Allergies stay visible on every tab, and the doctor's latest instructions appear on the first screen.</p></div>
+
+    <div class="ph"><div class="device"><div class="scr">
+      <div class="sb"><span>07:24</span><span>●●● 5G</span></div>
+      <div class="ab"><span class="t">Record vitals</span><span class="s">R. Kumar · 3F-B07 · 07:24</span></div>
+      <div class="body">
+        <div class="m-grid">
+          <div class="m-field"><span class="m-lbl">BP mmHg</span><span class="v">128/80</span></div>
+          <div class="m-field"><span class="m-lbl">Pulse /min</span><span class="v">94</span></div>
+          <div class="m-field"><span class="m-lbl">Temp °C</span><span class="v hi">38.6</span></div>
+          <div class="m-field"><span class="m-lbl">SpO₂ %</span><span class="v">95</span></div>
+          <div class="m-field"><span class="m-lbl">RR /min</span><span class="v">20</span></div>
+          <div class="m-field"><span class="m-lbl">Pain (VAS)</span><span class="v">3</span></div>
+          <div class="m-field"><span class="m-lbl">GRBS mg/dL</span><span class="v">142</span></div>
+          <div class="m-field"><span class="m-lbl">O₂ / FiO₂</span><span class="v">2 L</span></div>
+        </div>
+        <div class="m-card" style="background:#fbe5e3;border-color:#f3c3be"><b style="color:#b3261e">Temp 38.6 °C is above the doctor's threshold (38.5)</b><span>The doctor on duty will be alerted when you save.</span></div>
+        <div class="m-btn">Save vitals</div>
+      </div>
+    </div></div><p class="ph-cap"><b>6 · Vitals</b>Range checks and red flags. Saved to <code>Vitalsmonitoring</code>, so the doctor sees it on the timeline immediately.</p></div>
+
+    <div class="ph"><div class="device"><div class="scr">
+      <div class="sb"><span>08:02</span><span>●●● 5G</span></div>
+      <div class="ab"><span class="t">Medication · 08:00 round</span><span class="s">R. Kumar · 3F-B07</span></div>
+      <div class="body">
+        <div class="m-card"><div class="m-row"><b>Inj. Ceftriaxone 1 g</b><span class="m-chip a">Due 08:00</span></div><span style="color:#6b7590">IV · BD · Dr. Arjun · dispensed ✓</span>
+          <div class="m-grid"><div class="m-btn" style="background:#17804f">Given</div><div class="m-btn ghost">Held / refused</div></div></div>
+        <div class="m-card"><div class="m-row"><b>Tab. Paracetamol 650</b><span class="m-chip a">Due 08:00</span></div><span style="color:#6b7590">Oral · SOS if T &gt; 38.5 · dispensed ✓</span>
+          <div class="m-grid"><div class="m-btn" style="background:#17804f">Given</div><div class="m-btn ghost">Held / refused</div></div></div>
+        <div class="m-card"><div class="m-row"><b>Tab. Pantoprazole 40</b><span class="m-chip g">Given 06:05</span></div><span style="color:#6b7590">by Priya · before food</span></div>
+      </div>
+    </div></div><p class="ph-cap"><b>7 · MAR</b>Uses the nurse_console administer path, recording site and batch. Held or refused requires a reason. Only dispensed doses appear.</p></div>
+
+    <div class="ph"><div class="device"><div class="scr">
+      <div class="sb"><span>13:10</span><span>●●● 5G</span></div>
+      <div class="ab"><span class="t">Nutrition &amp; I/O</span><span class="s">R. Kumar · Soft diet · 1,800 kcal</span></div>
+      <div class="body">
+        <div class="m-card"><div class="m-row"><span class="m-lbl">Today</span><b class="mono">1,150 / 1,800 kcal</b></div><div class="bar"><i style="width:64%"></i></div></div>
+        <div class="m-card"><div class="m-row"><b>Lunch · 13:00</b><span class="m-chip g">Delivered</span></div><span class="m-lbl">Consumed</span><div class="m-tabs"><span class="m-tab">None</span><span class="m-tab">25%</span><span class="m-tab on">50%</span><span class="m-tab">75%</span><span class="m-tab">All</span></div></div>
+        <div class="m-card"><div class="m-row"><span class="m-lbl">Intake</span><b class="mono">1,450 mL</b></div><div class="m-row"><span class="m-lbl">Output</span><b class="mono">1,100 mL</b></div><div class="m-row"><span class="m-lbl">Balance</span><b class="mono" style="color:#17804f">+350 mL</b></div></div>
+        <div class="m-btn ghost">+ Add intake / output</div>
+      </div>
+    </div></div><p class="ph-cap"><b>8 · Nutrition + I/O</b>Diet order is read from IP Diet V2. Consumption is written to MOP and mirrored to HMS. I/O is saved to <code>Fluids</code>.</p></div>
+
+    <div class="ph"><div class="device"><div class="scr">
+      <div class="sb"><span>11:30</span><span>●●● 5G</span></div>
+      <div class="ab"><span class="t">Doctor app · R. Kumar</span><span class="s">IP Day 3 · Nursing tab</span></div>
+      <div class="body">
+        <div class="m-tabs"><span class="m-tab">EMR</span><span class="m-tab on">Nursing</span><span class="m-tab">Rx</span><span class="m-tab">Labs</span></div>
+        <div class="m-card"><span class="m-lbl">Vitals trend (24 h)</span><div class="m-row mono" style="font-size:11px"><span>T 38.2→38.6</span><span>SpO₂ 93→95</span></div><span class="m-chip r" style="width:max-content">Fever alert 07:24</span></div>
+        <div class="m-card"><span class="m-lbl">MAR today</span><div class="m-row"><span>Given 5</span><span>Due 3</span><span style="color:#b3261e">Held 1</span></div></div>
+        <div class="m-card"><span class="m-lbl">Nutrition · I/O</span><span>Lunch 50% · 1,150 kcal · Balance +350 mL</span></div>
+        <div class="m-card"><span class="m-lbl">Last nursing note · Priya 10:15</span><span>Patient comfortable, mild cough, ambulated with support.</span></div>
+      </div>
+    </div></div><p class="ph-cap"><b>9 · Doctor sees it</b>A new Nursing tab in the doctor's IP patient view shows vitals, MAR, diet, I/O, notes and handover.</p></div>
+
+  </div>
+</section>
+
+<!-- BUILD -->
+<section id="build">
+  <span class="eyebrow">Build plan</span>
+  <h2>What to build, in order</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Phase</th><th>Backend (DoctorAPI + SQL)</th><th>Flutter (DoctorApp)</th></tr></thead>
+    <tbody>
+      <tr><td>P0 · Foundations<span class="sub">blocks everything</span></td>
+        <td>Add a real role flag (<code>is_nurse</code> / <code>is_charge_nurse</code>), not a name match. Add a <code>fn_NurseCanAccessBed(nurse_user_id, bed_id, now)</code> SP helper. Add <code>NurseMobile/MyAllocation</code> and <code>NurseMobile/ScanBed</code> endpoints, an HMAC bed token, and a <code>nurse_bed_access_log</code> table. Add a web admin page that prints bed QR labels per ward.</td>
+        <td>Route by role id. Add the <code>mobile_scanner</code> package, the home screen with allotted floors, the scanner, and the denied/allowed screens. Store the access grant in memory.</td></tr>
+      <tr><td>P1 · Chart + doctor summary</td>
+        <td><code>NurseMobile/FloorCensus</code> and <code>PatientSnapshot</code> (demographics, allergies, diagnosis, latest doctor note, active Rx, pending investigations, diet order, instructions to nurse). Every write SP checks the grant and takes <code>nurse_user_id</code> from the token.</td>
+        <td>Floor census, patient hub, and vitals entry with range checks (reuse the <code>Vitalsmonitoring</code> model from my-ip-patients). Doctor summary card.</td></tr>
+      <tr><td>P2 · MAR, I/O, notes, diet</td>
+        <td>Expose nurse_console administer and dose-list APIs for mobile. Mirror diet consumption from MOP into an HMS table. Fix the I/O and notes endpoints (created_by from the server).</td>
+        <td>MAR round screen, I/O, structured notes, diet consumption, and tasks with vitals/photo completion.</td></tr>
+      <tr><td>P3 · Close the loop</td>
+        <td>Fix shift handover (patients, nurse ids, acknowledge). Schedule the <code>CHECK_OVERDUE</code> job. Implement cover requests and approvals. Add auth to the display board API.</td>
+        <td>Doctor-side Nursing tab, handover at shift end, push alerts for red-flag vitals, offline queue for vitals and notes. Wristband and medicine barcode (optional).</td></tr>
+    </tbody>
+  </table></div>
+  <div class="card">
+    <h3>Confirm with the backend team first</h3>
+    <ul class="clean">
+      <li>Are nurse → floor allocations maintained in <code>nursing_duty_roster</code> (per shift) or in <code>doctor_user.LocationId</code> (permanent)? The scan check should use the roster first and fall back to LocationId.</li>
+      <li>Does <code>SP_D_P_Casesheet_select</code> read <code>vitals_monitoring</code>? This decides whether OP queue vitals reach the doctor.</li>
+      <li>Does the older <code>doctor_prescription_new</code> page trigger <code>SP_NurseConsole_GenerateDoses</code>? If not, those prescriptions never produce MAR doses.</li>
+      <li>DoctorApp points at <code>shabdhamapitest</code>. Which environment has the latest nursing SPs deployed?</li>
+    </ul>
+  </div>
+</section>
+
+<footer>Source: read-only analysis of <code>Healthcare Management System/</code> (DoctorAPI, DoctorApplication, DBScripts, Docs audit 2026-08-13) and <code>DoctorApp/lib/features/{nurse, nurse_superintendent, my-ip-patients}</code>. Items marked "Inferred" depend on stored-procedure bodies that aren't in the repo. Patient and staff names in the mockups are examples.</footer>
+</div>

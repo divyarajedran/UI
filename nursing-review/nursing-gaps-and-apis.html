@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nursing Gaps &amp; API Spec</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,650&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f5f6f8; --surface:#ffffff; --sunk:#eceff4; --ink:#172033; --ink2:#4a556b; --ink3:#7a8499;
+  --line:#d9dee7; --navy:#233b77; --navy-soft:#e3e8f4;
+  --ok:#17804f; --ok-bg:#e2f3ea; --warn:#9a6200; --warn-bg:#fbf0d9; --bad:#b3261e; --bad-bg:#fbe5e3; --info:#2b5fb3; --info-bg:#e3ecfa;
+  --new:#6b3fa0; --new-bg:#efe6f8;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif; --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  color-scheme:dark;
+  --bg:#0f1420; --surface:#171e2d; --sunk:#1e2638; --ink:#e7ebf3; --ink2:#b3bccd; --ink3:#8792a8; --line:#2c3549; --navy:#8fa8e8; --navy-soft:#223055;
+  --ok:#5fcf97; --ok-bg:#15352a; --warn:#e8b457; --warn-bg:#3a2d12; --bad:#f08a80; --bad-bg:#3d1c1a; --info:#86aef0; --info-bg:#1c2c4a; --new:#c6a2f0; --new-bg:#2e2342;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0f1420; --surface:#171e2d; --sunk:#1e2638; --ink:#e7ebf3; --ink2:#b3bccd; --ink3:#8792a8; --line:#2c3549; --navy:#8fa8e8; --navy-soft:#223055;
+  --ok:#5fcf97; --ok-bg:#15352a; --warn:#e8b457; --warn-bg:#3a2d12; --bad:#f08a80; --bad-bg:#3d1c1a; --info:#86aef0; --info-bg:#1c2c4a; --new:#c6a2f0; --new-bg:#2e2342;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:24px 80px}
+h1,h2,h3{font-family:var(--serif);font-weight:650;text-wrap:balance;line-height:1.2;margin:0}
+h1{font-size:clamp(30px,5vw,42px)} h2{font-size:27px} h3{font-size:17px;font-family:var(--sans);font-weight:700}
+p{margin:0} .muted{color:var(--ink2)} .small{font-size:13px}
+code,.mono{font-family:var(--mono);font-size:12.5px}
+code{background:var(--sunk);padding:1px 5px;border-radius:4px;word-break:break-word}
+.eyebrow{font:600 12px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--navy)}
+.docnav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
+.docnav a{font-size:13px;text-decoration:none;color:var(--ink2);padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface)}
+.docnav a[aria-current="page"]{background:var(--navy);border-color:var(--navy);color:var(--surface)}
+header.top{display:grid;gap:12px;padding-bottom:22px;border-bottom:1px solid var(--line)}
+.lede{max-width:74ch;color:var(--ink2);font-size:16px}
+nav.toc{display:flex;flex-wrap:wrap;gap:8px}
+nav.toc a{font-size:13px;color:var(--ink);text-decoration:none;border:1px solid var(--line);padding:5px 11px;border-radius:99px;background:var(--surface)}
+nav.toc a:hover,nav.toc a:focus-visible,.docnav a:focus-visible{border-color:var(--navy);color:var(--navy);outline:none}
+section{padding-top:46px;display:grid;gap:16px}
+.intro{max-width:76ch;color:var(--ink2)}
+.pill{display:inline-flex;align-items:center;gap:5px;font:600 11.5px/1 var(--sans);padding:4px 8px;border-radius:99px;white-space:nowrap;width:max-content}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.ok{color:var(--ok);background:var(--ok-bg)} .warn{color:var(--warn);background:var(--warn-bg)} .bad{color:var(--bad);background:var(--bad-bg)} .info{color:var(--info);background:var(--info-bg)} .new{color:var(--new);background:var(--new-bg)}
+.m{font:600 10.5px/1 var(--mono);padding:3px 6px;border-radius:4px;background:var(--sunk);color:var(--ink2);margin-right:4px}
+.legend{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:13px;color:var(--ink2)}
+/* target flow */
+.flow{display:grid;gap:12px}
+.lane{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px}
+.steps{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:10px;counter-reset:s}
+.step{counter-increment:s;border:1px solid var(--line);border-radius:8px;padding:12px;display:grid;gap:6px;align-content:start;background:var(--bg)}
+.step .hd{display:flex;justify-content:space-between;gap:6px;align-items:center}
+.step .hd::before{content:counter(s);font:600 11px/1 var(--mono);color:var(--ink3)}
+.step b{font-size:14px;line-height:1.3}
+.step p{font-size:12.5px;color:var(--ink2);line-height:1.45}
+.who{font:600 10.5px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:4px}
+.who.d{background:var(--info-bg);color:var(--info)} .who.n{background:var(--ok-bg);color:var(--ok)} .who.s{background:var(--sunk);color:var(--ink2)} .who.p{background:var(--warn-bg);color:var(--warn)}
+.today{font-size:12px;border-top:1px dashed var(--line);padding-top:6px;color:var(--ink3)}
+.today b{font-size:12px;color:var(--bad)}
+/* tables */
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:900px;font-size:13.5px}
+th,td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font:600 11.5px/1.3 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);background:var(--sunk)}
+tr:last-child td{border-bottom:0}
+td.id{font:600 12px/1.4 var(--mono);color:var(--ink3);white-space:nowrap}
+td b{font-weight:650}
+td .sub{display:block;color:var(--ink3);font-size:12px;margin-top:3px}
+.sev{font:700 10.5px/1 var(--sans);padding:3px 6px;border-radius:4px;white-space:nowrap}
+.sev.p0{background:var(--bad-bg);color:var(--bad)} .sev.p1{background:var(--warn-bg);color:var(--warn)} .sev.p2{background:var(--sunk);color:var(--ink2)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs button{font:600 13px/1 var(--sans);padding:8px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink2);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--navy);color:var(--surface);border-color:var(--navy)}
+.tabs button:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:10px;align-content:start}
+ul.clean{margin:0;padding-left:18px;display:grid;gap:6px}
+.api{background:var(--surface);border:1px solid var(--line);border-radius:12px;display:grid;overflow:hidden}
+.api-h{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--sunk)}
+.api-h .path{font:600 14px/1.3 var(--mono);color:var(--ink)}
+.api-b{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:0}
+.api-b > div{padding:14px 16px;display:grid;gap:8px;align-content:start}
+.api-b > div + div{border-left:1px solid var(--line)}
+@media (max-width:700px){.api-b > div + div{border-left:0;border-top:1px solid var(--line)}}
+pre{margin:0;font:12px/1.55 var(--mono);background:var(--sunk);padding:10px 12px;border-radius:8px;overflow-x:auto;color:var(--ink)}
+.lbl{font:600 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3)}
+.grid-api{display:grid;gap:14px}
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);font-size:13px;color:var(--ink3)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="docnav" aria-label="Documents">
+  <a href="nursing-flow-blueprint.html">1 · Blueprint</a>
+  <a href="nursing-gaps-and-apis.html" aria-current="page">2 · Gaps &amp; API spec</a>
+  <a href="nurse-mobile-prototype.html">3 · Nurse app (mobile)</a>
+  <a href="doctor-console-web.html">4 · Doctor console (web)</a>
+  <a href="doctor-mobile-prototype.html" style="font-size:13px;text-decoration:none;padding:6px 12px;border-radius:8px;border:1px solid var(--line);color:var(--ink2);background:var(--surface)">5 · Doctor app (mobile)</a>
+</nav>
+
+<header class="top">
+  <span class="eyebrow">HMS nursing · Target state · 21 Sep 2026</span>
+  <h1>Nursing Gaps &amp; API Spec</h1>
+  <p class="lede">This page describes the complete doctor ↔ nurse working flow we need, then lists every gap blocking it on the web and mobile, split into doctor side and nurse side. It ends with the API contract: what exists today, what must change, and what's new.</p>
+  <nav class="toc" aria-label="Sections">
+    <a href="#target">Target flow</a><a href="#principles">Rules</a><a href="#web">Web gaps</a><a href="#mobile">Mobile gaps</a><a href="#apis-now">APIs today</a><a href="#apis-change">APIs to change</a><a href="#apis-new">New APIs</a><a href="#db">DB changes</a><a href="#order">Build order</a>
+  </nav>
+  <div class="legend"><span class="who d">Doctor</span><span class="who n">Nurse</span><span class="who p">Pharmacy / Kitchen</span><span class="who s">System</span> · <span class="sev p0">P0 blocker</span><span class="sev p1">P1 needed</span><span class="sev p2">P2 improve</span></div>
+</header>
+
+<!-- TARGET -->
+<section id="target">
+  <span class="eyebrow">What we need</span>
+  <h2>The complete working flow (target)</h2>
+  <p class="intro">Every step below must work for both web and mobile, because both call the same APIs. The red "today" line under each step shows what is broken or missing now. The key idea: <b>the doctor never has to open the nurse console to see nursing work</b>, and <b>the nurse never has to open the EMR to see the doctor's orders</b>.</p>
+
+  <div class="flow">
+    <div class="lane">
+      <h3>IP flow: admission to discharge</h3>
+      <div class="steps">
+        <div class="step"><div class="hd"><span class="who d">Doctor</span></div><b>Admission request with structured nursing orders</b><p>Vitals frequency, I/O monitoring, diet, activity, fall precautions, "notify if" thresholds.</p><div class="today"><b>Today:</b> one free-text <code>instructionToNurse</code>, which nurses never see.</div></div>
+        <div class="step"><div class="hd"><span class="who s">System</span></div><b>Admit, allocate bed, notify floor nurses</b><p>Admission tasks generate once on the server. Nurses on duty for that floor get a push notification.</p><div class="today"><b>Today:</b> tasks generate twice (client + server) and there's no push.</div></div>
+        <div class="step"><div class="hd"><span class="who n">Nurse</span></div><b>Scan bed → admission assessment</b><p>Access is allowed only for the allotted floor. The nurse records the admission vitals, Braden, Morse, pain score, nutrition screen, allergies and belongings.</p><div class="today"><b>Today:</b> no scan, no floor check, no Braden or Morse scale, and the ICU assessment form can't be saved.</div></div>
+        <div class="step"><div class="hd"><span class="who d">Doctor</span></div><b>Orders: medicines, investigations, diet, nursing</b><p>Each order becomes a nursing item: medicines become MAR doses, labs become sample tasks, diet goes to the kitchen, and nursing orders become tasks.</p><div class="today"><b>Today:</b> only medicines reach the nurse, and only from the console page. <code>GENERATE_ORDER</code> is never called.</div></div>
+        <div class="step"><div class="hd"><span class="who n">Nurse</span></div><b>Acknowledge each new order</b><p>The doctor sees "Seen by Priya 09:12".</p><div class="today"><b>Today:</b> doesn't exist.</div></div>
+        <div class="step"><div class="hd"><span class="who p">Pharmacy</span></div><b>Dispense, then generate MAR doses</b><p>Doses are created from <code>medicine_prescription</code> with the correct ward and branch.</p><div class="today"><b>Today:</b> ward is null on almost all rows, and prescriptions from the older page create no doses.</div></div>
+        <div class="step"><div class="hd"><span class="who n">Nurse</span></div><b>Bedside care each shift</b><p>Vitals, MAR (given, held or refused, with a reason), I/O, diabetic chart, meal consumption, structured notes and tasks. Everything is saved with the nurse's ID.</p><div class="today"><b>Today:</b> two MAR paths, nurse_id is null or 0 on some saves, and meal consumption is stored only in MOP.</div></div>
+        <div class="step"><div class="hd"><span class="who s">System</span></div><b>Alerts</b><p>Out-of-range vitals, held or refused doses, missed doses, or a meal refused twice push an alert to the treating doctor and the charge nurse.</p><div class="today"><b>Today:</b> no alerts reach the doctor, and overdue tasks never escalate automatically.</div></div>
+        <div class="step"><div class="hd"><span class="who d">Doctor</span></div><b>Nursing tab on the round</b><p>One view with vitals trend, MAR today, I/O balance, diet eaten and kcal, notes, tasks, last handover and order acknowledgements.</p><div class="today"><b>Today:</b> the doctor sees MAR only inside the nurse console. Tasks, diet and handover aren't visible anywhere.</div></div>
+        <div class="step"><div class="hd"><span class="who n">Nurse</span></div><b>Shift handover (SBAR)</b><p>The outgoing nurse sends a per-patient SBAR, and the incoming nurse acknowledges it before starting.</p><div class="today"><b>Today:</b> patient notes are lost on save, nurse IDs are 0, and there's no read or acknowledge screen.</div></div>
+        <div class="step"><div class="hd"><span class="who n">Nurse</span></div><b>Transfer or discharge</b><p>Covers the nursing discharge checklist, MAR reconciliation, stopping the diet, and returning medicines.</p><div class="today"><b>Today:</b> discharge tasks work, but the summary uses admission vitals only.</div></div>
+      </div>
+    </div>
+
+    <div class="lane">
+      <h3>OP flow: check-in to post-consult</h3>
+      <div class="steps">
+        <div class="step"><div class="hd"><span class="who s">System</span></div><b>Check-in adds the patient to the OP nurse queue</b><p>A token is issued, and the patient is routed to the nurse station for the doctor's location.</p><div class="today"><b>Today:</b> patients are added manually. Check-in doesn't add them to the queue, and location filtering is dropped.</div></div>
+        <div class="step"><div class="hd"><span class="who n">Nurse</span></div><b>Triage: vitals and assessment</b><p>Vitals (including blood sugar), allergies, pain, fall risk, nutrition screen. Everything is saved to the <b>same</b> visit vitals record the doctor reads.</p><div class="today"><b>Today:</b> vitals are split across two stores, sugar type is dropped, nurse_id is null, and there are no range checks in the app.</div></div>
+        <div class="step"><div class="hd"><span class="who d">Doctor</span></div><b>Case sheet shows everything the nurse captured</b><p>Vitals, allergies, arrival time, psychosocial answers, pain and fall risk, with a "Vitals ready" badge in the doctor's queue.</p><div class="today"><b>Today:</b> allergies and psychosocial answers are never shown, and queue vitals probably aren't either.</div></div>
+        <div class="step"><div class="hd"><span class="who d">Doctor</span></div><b>OP procedure orders</b><p>Injection, dressing and nebulization orders create OP nurse tasks.</p><div class="today"><b>Today:</b> doesn't exist.</div></div>
+        <div class="step"><div class="hd"><span class="who n">Nurse</span></div><b>Complete the procedure → billing + doctor</b><p>Records what was done, when, and by whom. Billing is triggered.</p><div class="today"><b>Today:</b> doesn't exist.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRINCIPLES -->
+<section id="principles">
+  <span class="eyebrow">Non-negotiables</span>
+  <h2>Rules every API must follow</h2>
+  <div class="cols2">
+    <div class="card"><h3>Identity from the token, never from the request body</h3><p class="small muted"><code>nurse_user_id</code> and <code>created_by</code> come from the JWT or the server session. Today the nurse ID comes from the <code>DoctorId</code> cookie (null for nurses) and nursing notes send <code>created_by</code> from the browser.</p></div>
+    <div class="card"><h3>Location access enforced in SQL</h3><p class="small muted">Every nurse read or write passes through <code>fn_NurseCanAccessVisit(@nurse_user_id, @visit_reportid, GETDATE())</code>. Charge nurses and the Nursing Superintendent (NS) can read all patients, but writes still follow the roster or an approved cover.</p></div>
+    <div class="card"><h3>One store per fact</h3><p class="small muted">Vitals go to <code>ip_vitalsmonitoring_details</code> (IP) and the visit vitals record (OP). MAR goes to <code>medication_delivery_schedule</code> through the nurse console path only. Diet consumption is mirrored into HMS.</p></div>
+    <div class="card"><h3>No hard deletes of clinical data</h3><p class="small muted">Vitals, fluids and notes use soft delete (<code>is_deleted</code>, <code>deleted_by</code>, <code>reason</code>) with an audit record. Records can't be edited after discharge (enforced on the server, not only in JS).</p></div>
+  </div>
+</section>
+
+<!-- WEB GAPS -->
+<section id="web">
+  <span class="eyebrow">Web · Healthcare Management System</span>
+  <h2>Web gaps</h2>
+  <div class="tabs" role="tablist" aria-label="Web gap side">
+    <button role="tab" id="t-wn" aria-selected="true" aria-controls="p-wn">Nurse side (17)</button>
+    <button role="tab" id="t-wd" aria-selected="false" aria-controls="p-wd">Doctor side (10)</button>
+  </div>
+
+  <div class="tbl" id="p-wn" role="tabpanel" aria-labelledby="t-wn"><table>
+    <thead><tr><th>#</th><th>Gap</th><th>Where (today)</th><th>Needed fix</th><th>API / SP</th><th>Pri</th></tr></thead>
+    <tbody>
+      <tr><td class="id">WN-01</td><td><b>No nurse role, so nurses land on the doctor dashboard</b><span class="sub">"Nurse" is guessed from the role name using 3 different rules</span></td><td><code>Home.js:209</code>, <code>NurseTaskNotification.js</code>, <code>NurseWorklist.js:19</code></td><td>Add <code>role_type</code> (DOCTOR / NURSE / CHARGE_NURSE / NS) to the role master. Nurses land on Nurse Console Pro, scoped to their allocation.</td><td><span class="m">CHG</span>LoginVerification</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">WN-02</td><td><b>Floor/ward allocation isn't enforced</b><span class="sub">It's only a UI default. The client decides <code>floor_scope</code>.</span></td><td><code>39_nurse_scope_by_location.sql</code>, <code>NursingAutomationController.cs:899</code></td><td>Server-side <code>fn_NurseCanAccessVisit</code> in every nurse SP. Out-of-scope access returns 403.</td><td><span class="m">NEW</span>fn + all nurse SPs</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">WN-03</td><td><b>Nurse identity is lost on writes</b></td><td>OP vitals <code>nurse_id ← DoctorId</code> (null); IP vitals <code>doctorid "0"</code>; notes <code>created_by</code> from the browser</td><td>Take the user from the token on the server. Add a <code>source</code> column (WEB/MOBILE).</td><td><span class="m">CHG</span>OPVitalsEntry, IPVitalsMonitoring, NursingNotes</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">WN-04</td><td><b>Two MAR paths with different status sets</b><span class="sub">GIVEN/NPO vs DELIVERED/ADMINISTERED</span></td><td>nurse_console vs MedicationDelivery page</td><td>Standardize on <code>NurseConsole_MAR</code>. Change the MedicationDelivery page to read it, or retire the page.</td><td><span class="m">CHG</span>MedicationDelivery_StatusUpdate</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">WN-05</td><td><b>MAR doses have no ward</b><span class="sub">3 of 3,239 rows have <code>wardid</code></span></td><td><code>SP_NurseConsole_GenerateDoses</code> (branch_id=0)</td><td>Set ward, branch and floor from the current bed at generation time, and update them on transfer.</td><td><span class="m">CHG</span>NurseConsole_Prescription GEN</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">WN-06</td><td><b>The older prescription page creates no MAR doses</b></td><td><code>doctor_prescription_new</code> → <code>Medicine_Prescription_Ins_Upd</code></td><td>Call GenerateDoses after every IP prescription save, from any screen.</td><td><span class="m">CHG</span>PatientDashboard/Medicine_Prescription_Ins_Upd</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">WN-07</td><td><b>Doctor orders other than medicines never reach the nurse</b></td><td><code>GENERATE_ORDER</code> has no caller</td><td>Add a structured <code>doctor_order</code> table with acknowledgement. Generate tasks when an order is saved.</td><td><span class="m">NEW</span>DoctorOrders · <span class="m">CHG</span>GenerateTasksForOrder</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WN-08</td><td><b>Check-in doesn't feed the OP queue</b></td><td><code>OPNurseQueue.js:800</code> manual add only</td><td><code>SP_D_Patient_checkin</code> inserts into <code>op_nurse_queue</code>.</td><td><span class="m">CHG</span>Patient_checkin</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WN-09</td><td><b>OP vitals are stored in two places</b></td><td><code>vitals_monitoring</code> vs visit-report vitals</td><td>OPVitalsEntry writes to the visit-report vitals (the store the case sheet reads). Add a <code>blood_sugar_type</code> parameter.</td><td><span class="m">CHG</span>OPVitalsEntry, DNursingAutomation.cs:671</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">WN-10</td><td><b>OP queue location filter is dropped</b></td><td>DAL <code>OPNurseQueue_Ins_Upd_Sel</code> doesn't pass <code>@P_LocationIds</code></td><td>Pass it, and derive it from the allocation on the server.</td><td><span class="m">CHG</span>OPQueue</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WN-11</td><td><b>Task engine is only half wired</b></td><td>CHECK_OVERDUE has no job; deferred tasks only reactivate while a board is open; admission tasks generate twice; recurring job is hard-coded to <code>hms241224</code></td><td>Add a SQL Agent job for overdue, deferred and recurring tasks (with the DB name from config). Remove the client-side GENERATE call and dedupe in the SP.</td><td><span class="m">CHG</span>NursingTask GENERATE/CHECK_*</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WN-12</td><td><b>Task completion doesn't capture evidence</b></td><td>UI sends only notes and sample_collected</td><td>Link <code>vitals_record_id</code>, add photo upload, and complete the task automatically when a matching vitals or MAR entry is saved.</td><td><span class="m">CHG</span>TaskCompletion, AutoCompleteMatchingTask</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WN-13</td><td><b>Shift handover is broken</b></td><td><code>WardWorkspace.js:423</code> sends <code>[object Object]</code>; nurse IDs are 0; <code>acknowledged_at</code> is set when sent</td><td>Send the patients as JSON. Take nurse IDs from the roster. Add <code>ACK</code>, <code>S_PENDING</code> and an incoming-nurse read screen.</td><td><span class="m">CHG</span>ShiftHandover</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WN-14</td><td><b>Ward workspace Quick Vitals is broken</b></td><td><code>WardWorkspace.js:340</code> uses the wrong URL and field names</td><td>Post to <code>Vitalsmonitoring_Ins_Upd_sel</code> with <code>IP_SYSBp…</code> fields.</td><td><span class="m">FIX</span>JS only</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WN-15</td><td><b>IP nutrition data isn't in HMS</b></td><td>MOP holds consumption and kcal; <code>diet_delivery_tracking</code> has 0 rows</td><td>Mirror MarkConsumption and SaveAssessment into <code>ip_diet_consumption</code> and <code>ip_nutrition_assessment</code>. Retire the legacy diet delivery.</td><td><span class="m">CHG</span>IpDietV2/MarkConsumption, SaveAssessment</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WN-16</td><td><b>No structured nursing assessments or care plan</b></td><td>No Braden, Morse, IP fall-risk or care plan; <code>icuautomation.cshtml</code> is static</td><td>Add a <code>nursing_assessment</code> table (type, score, answers JSON, next due) and generate tasks for the next due assessment.</td><td><span class="m">NEW</span>NursingAssessment</td><td><span class="sev p2">P2</span></td></tr>
+      <tr><td class="id">WN-17</td><td><b>Hard deletes, free-text notes, no bed QR, public display board</b></td><td>DEL on vitals, fluids and notes; notes have no category; only a food QR exists; DisplayBoard has no <code>[Authorize]</code></td><td>Soft delete with audit; note category plus SBAR; bed QR labels; add auth to the display board.</td><td><span class="m">CHG</span>Vitalsmonitoring/Fluids/NursingNotes · <span class="m">NEW</span>BedQrLabels</td><td><span class="sev p1">P1</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="tbl" id="p-wd" role="tabpanel" aria-labelledby="t-wd" hidden><table>
+    <thead><tr><th>#</th><th>Gap</th><th>Where (today)</th><th>Needed fix</th><th>API / SP</th><th>Pri</th></tr></thead>
+    <tbody>
+      <tr><td class="id">WD-01</td><td><b>Doctor sees the MAR only by opening the nurse console</b></td><td><code>nurse_console</code>, IpManagementV2 Task Board iframe</td><td>Add a "Nursing" panel to IpManagementV2 and IP patient details: doses given, held, refused and missed today, with reasons.</td><td><span class="m">NEW</span>NurseMobile/NursingSummary (shared by web and app)</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">WD-02</td><td><b>Timeline and case sheet omit nursing work</b></td><td><code>NewIPTimelineView</code> (TLD/CTV/AMPS)</td><td>Add timeline sections for MAR administrations, task completions, diet consumption, assessments and handover.</td><td><span class="m">CHG</span>AdmitPatient_Ins_Upd_Sel TLD</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WD-03</td><td><b>Doctor workspace (DSUM) has no nursing signals</b></td><td><code>DoctorWorkspace.js</code></td><td>Add columns for missed doses, abnormal vitals in the last 6 h, I/O balance and "meals refused".</td><td><span class="m">CHG</span>DSUM SP</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WD-04</td><td><b>OP case sheet hides nurse assessment fields</b></td><td>Allergies, arrival time, psychosocial and substance answers are read only by the Quick Entry modal</td><td>Return them from <code>CaseSheetSelect</code> and show an "Allergies" banner on the case sheet.</td><td><span class="m">CHG</span>CaseStudy/CaseSheetSelect</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">WD-05</td><td><b>OP queue vitals probably don't reach the case sheet</b></td><td><code>vitals_monitoring</code> isn't read</td><td>Resolved by WN-09. Also add a "Vitals ready" badge to the doctor's appointment list.</td><td><span class="m">CHG</span>select_Appointment_Request</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">WD-06</td><td><b>No alerts to the doctor</b></td><td>None</td><td>Alert rules for vitals outside the doctor's "notify if" thresholds, held or refused critical doses, and missed doses. Delivered to the web bell and mobile push.</td><td><span class="m">NEW</span>NursingAlerts</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WD-07</td><td><b>No order acknowledgement</b></td><td><code>instructionToNurse</code> is buried in the admit form</td><td>Structured orders with statuses (sent, seen, done) and the name of the nurse who acted on each.</td><td><span class="m">NEW</span>DoctorOrders</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">WD-08</td><td><b>Discharge summary misses the inpatient course</b></td><td>Uses admission vitals only</td><td>Pull the last vitals, I/O totals and MAR reconciliation (stopped or continued medicines).</td><td><span class="m">CHG</span>SP_discharge_summary_pdf</td><td><span class="sev p2">P2</span></td></tr>
+      <tr><td class="id">WD-09</td><td><b>Form-builder nursing notes aren't visible on the timeline</b></td><td>FormHead 9 data lives in the external form builder</td><td>Mirror a summary row into <code>ip_nursing_notes</code> when a form is submitted.</td><td><span class="m">CHG</span>IP_FormBuilder save hook</td><td><span class="sev p2">P2</span></td></tr>
+      <tr><td class="id">WD-10</td><td><b>No way for the doctor to mark nursing notes as reviewed</b></td><td>Vitals have verify (VVL); notes don't</td><td>Add "reviewed by / at" to notes and assessments.</td><td><span class="m">CHG</span>NursingNotes</td><td><span class="sev p2">P2</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- MOBILE GAPS -->
+<section id="mobile">
+  <span class="eyebrow">Mobile · Flutter DoctorApp</span>
+  <h2>Mobile gaps</h2>
+  <div class="tabs" role="tablist" aria-label="Mobile gap side">
+    <button role="tab" id="t-mn" aria-selected="true" aria-controls="p-mn">Nurse side (13)</button>
+    <button role="tab" id="t-md" aria-selected="false" aria-controls="p-md">Doctor side (7)</button>
+  </div>
+
+  <div class="tbl" id="p-mn" role="tabpanel" aria-labelledby="t-mn"><table>
+    <thead><tr><th>#</th><th>Gap</th><th>Where (today)</th><th>Needed</th><th>API</th><th>Pri</th></tr></thead>
+    <tbody>
+      <tr><td class="id">MN-01</td><td><b>Role detected by matching words in the role name</b></td><td><code>login_state_notifier.dart:80-87</code></td><td>Route by <code>role_type</code> from login. Treat the charge nurse as a separate role.</td><td><span class="m">CHG</span>LoginVerification</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">MN-02</td><td><b>No allocation. Every call sends <code>wardid: null</code></b></td><td><code>nurse_remote_datasource.dart</code></td><td>Load the allocation at login and show it on the shift-start screen. The server scopes all data.</td><td><span class="m">NEW</span>NurseMobile/MyAllocation</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">MN-03</td><td><b>No QR scanning or bed access check</b></td><td>No scanner package in pubspec</td><td>Add <code>mobile_scanner</code>, a scan screen, denied and allowed results, and a cover request.</td><td><span class="m">NEW</span>ScanBed, CoverRequest</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">MN-04</td><td><b>No patient list or patient hub for nurses</b></td><td>Nurses can't reach <code>my-ip-patients</code></td><td>Floor census and a patient hub with allergy banner, due items and tabs.</td><td><span class="m">NEW</span>FloorCensus, PatientSnapshot</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">MN-05</td><td><b>IP vitals, I/O, notes and diabetic chart are doctor-only screens</b></td><td><code>my-ip-patients/presentation/emr/*</code></td><td>Reuse the same widgets and logic under the nurse hub. Add range checks.</td><td><span class="m">REUSE</span>Ipmanagement/Vitalsmonitoring, Fluids, NursingNotes, Diabeticchart</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">MN-06</td><td><b>MAR uses the wrong path and shows all patients hospital-wide</b></td><td><code>nurse_medication_page.dart</code> → MedicationDeliveryUpdate</td><td>Switch to the per-patient due list and the nurse console administer call. Held or refused requires a reason.</td><td><span class="m">REUSE</span>NurseConsole/NurseConsole_MAR DAY, DOSE, ADM</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">MN-07</td><td><b>Diet tab reads the empty legacy table</b></td><td><code>nurse_diet_page.dart</code> → DietDelivery</td><td>Read the diet order from IP Diet V2 and record consumption (mirrored into HMS).</td><td><span class="m">REUSE</span>IpDietV2/TodayBoard, MarkConsumption</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">MN-08</td><td><b>Nurse can't see the doctor's orders or summary</b></td><td>Only the "assigned by doctor" name</td><td>Doctor summary screen: active medicines, latest note, investigations, instructions, diet order and "notify if" thresholds.</td><td><span class="m">NEW</span>PatientSnapshot · <span class="m">REUSE</span>NurseConsole_Prescription LST</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">MN-09</td><td><b>Task completion is incomplete and errors are hidden</b></td><td><code>nurse_task_complete_page.dart</code>; datasource returns <code>[]</code> on error</td><td>Vitals form for vitals tasks, photo capture, and error states in place of empty lists.</td><td><span class="m">CHG</span>TaskCompletion</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">MN-10</td><td><b>OP vitals: no blood sugar, no range checks, wrong visit ID</b></td><td><code>nurse_op_vitals_page.dart</code>; <code>visit_report_id = appointmentid</code></td><td>Add GRBS and sugar type, range validation, and send the correct <code>visit_report_id</code>.</td><td><span class="m">CHG</span>OPVitalsEntry</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">MN-11</td><td><b>No handover, push notifications or offline mode</b></td><td>None</td><td>Handover at shift end with acknowledgement. FCM push for new orders and alerts. Offline queue for vitals and notes (MAR stays online only).</td><td><span class="m">CHG</span>ShiftHandover · <span class="m">NEW</span>PushToken, Alerts</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">MN-12</td><td><b>No structured assessments</b></td><td><code>assess_assement_page.dart:172</code> uses mock data</td><td>Braden, Morse and pain assessments with scores and next-due reminders.</td><td><span class="m">NEW</span>NursingAssessment</td><td><span class="sev p2">P2</span></td></tr>
+      <tr><td class="id">MN-13</td><td><b>Existing bugs</b></td><td>IV fluids save not awaited (<code>iv_fluids_page.dart:78</code>); vitals toast check; "Yoga Notes" delete message; orphaned <code>quick_entry</code>; hard-coded base URL</td><td>Fix before reusing these screens for nurses.</td><td><span class="m">FIX</span>app only</td><td><span class="sev p1">P1</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="tbl" id="p-md" role="tabpanel" aria-labelledby="t-md" hidden><table>
+    <thead><tr><th>#</th><th>Gap</th><th>Where (today)</th><th>Needed</th><th>API</th><th>Pri</th></tr></thead>
+    <tbody>
+      <tr><td class="id">MD-01</td><td><b>No nursing view in the doctor app</b></td><td><code>home</code> and <code>clinical_data</code> have no nursing references</td><td>Nursing tab in IP patient details: vitals trend, MAR, I/O, diet, notes, tasks and handover.</td><td><span class="m">NEW</span>NurseMobile/NursingSummary</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">MD-02</td><td><b>IP patient list has no nursing flags</b></td><td><code>emr/my-ip-pat.dart</code></td><td>Badges for missed doses, abnormal vitals, meals refused and negative fluid balance.</td><td><span class="m">CHG</span>IP patient list SP (add flags)</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">MD-03</td><td><b>No push alerts</b></td><td>None</td><td>Critical vitals, held or refused doses, and "nurse needs review" requests reach the treating doctor.</td><td><span class="m">NEW</span>PushToken, NursingAlerts</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">MD-04</td><td><b>Doctor can't see whether a nurse has seen an order</b></td><td>None</td><td>Order list with sent, seen and done statuses, and the name of the nurse who acted.</td><td><span class="m">NEW</span>DoctorOrders</td><td><span class="sev p1">P1</span></td></tr>
+      <tr><td class="id">MD-05</td><td><b>OP consult vitals don't include nurse queue vitals</b></td><td><code>clinical_data_remote_datasource.dart:1111</code></td><td>Resolved on the server by WN-09. Show a "Vitals by nurse · time" label in the app.</td><td><span class="m">CHG</span>CaseStudy/Patient_General_Information</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">MD-06</td><td><b>IP prescriptions saved in the app must create MAR doses</b></td><td><code>PrescriptionIPPage</code></td><td>Confirm the endpoint triggers GenerateDoses (see WN-06).</td><td><span class="m">CHG</span>prescription save</td><td><span class="sev p0">P0</span></td></tr>
+      <tr><td class="id">MD-07</td><td><b>Doctor can't set "notify if" thresholds or nursing orders</b></td><td>None</td><td>Order sheet: vitals frequency, thresholds, I/O monitoring, activity and diet.</td><td><span class="m">NEW</span>DoctorOrders</td><td><span class="sev p1">P1</span></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- APIs TODAY -->
+<section id="apis-now">
+  <span class="eyebrow">API inventory</span>
+  <h2>APIs in use today and what happens to each</h2>
+  <p class="intro">All calls are <code>POST /api/{Controller}/{Action}</code> with a Bearer token, and most take a <code>Dml_Indicator</code>. The Fate column says what to do with each API: <span class="pill ok">Keep</span> <span class="pill warn">Change</span> <span class="pill bad">Replace</span> <span class="pill info">Reuse in mobile</span>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>API (Action · Dml)</th><th>Used by</th><th>Purpose</th><th>Fate</th><th>What changes</th></tr></thead>
+    <tbody>
+      <tr><td><code>DoctorLogIn/LoginVerification</code></td><td>Web + App</td><td>Login, user and role</td><td><span class="pill warn">Change</span></td><td>Return <code>role_type</code>, <code>nurse_user_id</code> and whether an allocation exists today.</td></tr>
+      <tr><td><code>NursingAutomation/TaskDashboard</code> · S_DASHBOARD</td><td>App nurse</td><td>Counts, SLA, ward</td><td><span class="pill warn">Change</span></td><td>Scope to the nurse's allocation on the server (ignore the client <code>wardid</code>).</td></tr>
+      <tr><td><code>NursingAutomation/NursingTask</code> · S_NURSE / I / GENERATE</td><td>Web + App</td><td>Task list, create, generate</td><td><span class="pill warn">Change</span></td><td>Scope on the server. GENERATE runs on the server only, with dedupe. Wire GENERATE_ORDER.</td></tr>
+      <tr><td><code>NursingAutomation/TaskStatusUpdate</code> · U_STATUS/U_DEFER</td><td>Web + App</td><td>Start, defer, escalate</td><td><span class="pill ok">Keep</span></td><td>Add an access check.</td></tr>
+      <tr><td><code>NursingAutomation/TaskCompletion</code> · I</td><td>Web + App</td><td>Complete a task</td><td><span class="pill warn">Change</span></td><td>Accept <code>vitals_record_id</code>, <code>mar_dose_id</code> and <code>photo_url</code>.</td></tr>
+      <tr><td><code>NursingAutomation/OPDoctorList</code>, <code>OPQueue</code>, <code>OPQueueStatusUpdate</code></td><td>Web + App</td><td>OP queue</td><td><span class="pill warn">Change</span></td><td>Pass <code>@P_LocationIds</code> in the DAL. Check-in adds patients to the queue.</td></tr>
+      <tr><td><code>NursingAutomation/OPVitalsEntry</code> · I/S</td><td>Web + App</td><td>OP vitals</td><td><span class="pill warn">Change</span></td><td>Nurse from the token, <code>blood_sugar_type</code>, and write to the visit-report vitals the case sheet reads.</td></tr>
+      <tr><td><code>NursingAutomation/MedicationSchedule</code> · S_WARD</td><td>App nurse</td><td>Hospital-wide dose list</td><td><span class="pill bad">Replace</span></td><td>Replace with <code>NurseConsole/NurseConsole_MAR</code> DAY (per patient) and <code>NurseMobile/DueList</code>.</td></tr>
+      <tr><td><code>NursingAutomation/MedicationDeliveryUpdate</code> · U_STATUS</td><td>App nurse, web MedicationDelivery page</td><td>Mark a dose delivered</td><td><span class="pill bad">Replace</span></td><td>Replace with <code>NurseConsole_MAR</code> ADM. Keep a mapped shim until the web page moves over.</td></tr>
+      <tr><td><code>NursingAutomation/DietDelivery</code>, <code>DietDeliveryUpdate</code></td><td>App nurse, web DietDelivery page</td><td>Legacy meals (0 rows)</td><td><span class="pill bad">Replace</span></td><td>Replace with <code>IpDietV2/TodayBoard</code> and <code>MarkConsumption</code>.</td></tr>
+      <tr><td><code>NursingAutomation/ReportTaskCompletion</code>, <code>ReportNursePerformance</code>, <code>ReportSLACompliance</code>, <code>ReportWardSummary</code></td><td>Web + App (nurse/NS)</td><td>Reports</td><td><span class="pill ok">Keep</span></td><td>Fix the night shift window in the board SP.</td></tr>
+      <tr><td><code>NursingAutomation/DutyRoster</code>, <code>NursesOnDuty</code>, <code>TaskTemplate*</code>, <code>NurseLocationAssignment</code></td><td>Web + App NS</td><td>Roster, templates</td><td><span class="pill ok">Keep</span></td><td>The roster becomes the source of truth for scan access.</td></tr>
+      <tr><td><code>NursingAutomation/NurseConsolidatedBoard</code>, <code>WardPatientSummary</code></td><td>Web</td><td>Nurse board, ward workspace</td><td><span class="pill info">Reuse</span></td><td>Force <code>floor_scope</code> on the server. Fix the priority values and done statuses.</td></tr>
+      <tr><td><code>NursingAutomation/ShiftHandover</code> · I/S</td><td>Web</td><td>Handover</td><td><span class="pill warn">Change</span></td><td>Patients as JSON, nurse IDs, <code>ACK</code> and <code>S_PENDING</code>.</td></tr>
+      <tr><td><code>NursingAutomation/NurseTaskNotification</code> · CNT/LIST</td><td>Web bell</td><td>Task notifications</td><td><span class="pill info">Reuse</span></td><td>Also used as the mobile alerts inbox, plus FCM push.</td></tr>
+      <tr><td><code>NursingLocation/LocationPicker</code>, <code>BedBoardByLocation</code>, <code>AdmittedPatientsByLocation</code></td><td>Web</td><td>Location scope</td><td><span class="pill info">Reuse</span></td><td>Backs FloorCensus.</td></tr>
+      <tr><td><code>NurseConsole/NurseConsole_Common</code> · PHDR, ALCK, TLNE, ALRT, AACK</td><td>Web</td><td>Patient header and allergies, allergy check, timeline, alerts</td><td><span class="pill info">Reuse</span></td><td>Add an access check. PHDR feeds the patient hub header.</td></tr>
+      <tr><td><code>NurseConsole/NurseConsole_Prescription</code> · LST, GEN</td><td>Web</td><td>Active prescriptions, generate doses</td><td><span class="pill warn">Change</span></td><td>GEN sets ward and branch. LST is used by the doctor summary.</td></tr>
+      <tr><td><code>NurseConsole/NurseConsole_MAR</code> · DAY, DOSE, ADM, GRID</td><td>Web</td><td>MAR list and administer</td><td><span class="pill info">Reuse</span></td><td>ADM takes the nurse from the token, requires a bed-access grant, and requires a reason when a dose is held or refused.</td></tr>
+      <tr><td><code>Ipmanagement/Vitalsmonitoring</code> · I/S/VVL/DEL</td><td>Web + App doctor</td><td>IP vitals</td><td><span class="pill warn">Change</span></td><td>Created-by from the token, soft delete, add GRBS, return <code>alert</code> flags.</td></tr>
+      <tr><td><code>Ipmanagement/Fluids</code>, <code>NursingNotes</code>, <code>Diabeticchart</code></td><td>Web + App doctor</td><td>I/O, notes, sugar</td><td><span class="pill warn">Change</span></td><td>Created-by from the token, soft delete. Notes get a category, SBAR fields and "reviewed by".</td></tr>
+      <tr><td><code>IpDietV2/TodayBoard</code>, <code>MarkConsumption</code>, <code>LoadAssessment</code>, <code>SaveAssessment</code></td><td>Web</td><td>IP diet via MOP</td><td><span class="pill warn">Change</span></td><td>Mirror consumption and assessment into HMS tables.</td></tr>
+      <tr><td><code>Ipmanagement/AdmitPatient_Ins_Upd_Sel</code> · TLD/CTV/AMPS</td><td>Web</td><td>IP timeline</td><td><span class="pill warn">Change</span></td><td>Add MAR, task, diet, assessment and handover sections.</td></tr>
+      <tr><td><code>CaseStudy/CaseSheetSelect</code>; app: <code>CaseStudy/Patient_General_Information_Ins_Sel</code></td><td>Web + App doctor</td><td>OP case sheet</td><td><span class="pill warn">Change</span></td><td>Return nurse assessment fields and "vitals by, at".</td></tr>
+      <tr><td><code>DisplayBoard/GetWardPatients</code>, <code>GetWardStaff</code></td><td>Kiosk</td><td>Ward display</td><td><span class="pill warn">Change</span></td><td>Add <code>[Authorize]</code> or a device key. Mask patient names.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- APIs to change detail -->
+<section id="apis-change">
+  <span class="eyebrow">Change details</span>
+  <h2>Parameter-level changes to existing APIs</h2>
+  <div class="grid-api">
+    <div class="api"><div class="api-h"><span class="pill warn">Change</span><span class="path">DoctorLogIn/LoginVerification</span></div><div class="api-b">
+      <div><span class="lbl">Add to response (Table1)</span><pre>"role_type": "NURSE",        // DOCTOR | NURSE | CHARGE_NURSE | NS
+"nurse_user_id": 412,
+"has_allocation_today": true</pre></div>
+      <div><span class="lbl">Why</span><p class="small muted">Replaces the "role name contains nurse" check in the web JS and <code>login_state_notifier.dart</code>.</p></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill warn">Change</span><span class="path">NursingAutomation/OPVitalsEntry · Dml "I"</span></div><div class="api-b">
+      <div><span class="lbl">Request changes</span><pre>- nurse_id            // REMOVE from client; server = token user
++ blood_sugar_type    // FBS | PPBS | RBS  (DAL param missing today)
+  visit_report_id     // must be the real visit id, not appointmentid</pre></div>
+      <div><span class="lbl">SP change</span><p class="small muted"><code>SP_OPVitalsEntry_NurseQueue</code> also upserts the visit-report vitals that <code>SP_D_P_Casesheet_select</code> reads, then sets the queue status to VITALS_DONE.</p></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill warn">Change</span><span class="path">NurseConsole/NurseConsole_MAR · Dml "ADM"</span></div><div class="api-b">
+      <div><span class="lbl">Request</span><pre>{ "Dml_Indicator":"ADM", "dose_id":88213,
+  "visit_reportid":55120, "status":"GIVEN",   // GIVEN|HELD|REFUSED|NPO|DELAYED
+  "reason_code":null, "site":"L forearm", "batch_no":"CFX2231",
+  "qty":1, "vitals_json":null, "access_grant":"eyJ…" }</pre></div>
+      <div><span class="lbl">Server rules</span><ul class="clean small"><li>Nurse comes from the token.</li><li>Rejects with 403 if the grant is missing, expired or for another bed.</li><li><code>reason_code</code> is required unless the status is GIVEN.</li><li>Raises a doctor alert for HELD or REFUSED on critical medicines.</li></ul></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill warn">Change</span><span class="path">NursingAutomation/ShiftHandover · Dml "I" / "ACK" / "S_PENDING"</span></div><div class="api-b">
+      <div><span class="lbl">Request (I)</span><pre>{ "Dml_Indicator":"I", "ward_id":31, "outgoing_shift":"MORNING",
+  "patients_json":[{ "visit_reportid":55120,
+     "situation":"Day 3 pneumonia, febrile 38.6",
+     "background":"DM2, penicillin allergy",
+     "assessment":"SpO2 95% on 2L, ate 50% lunch",
+     "recommendation":"Repeat temp 16:00, CBC pending" }] }</pre></div>
+      <div><span class="lbl">Fixes</span><ul class="clean small"><li>Replaces <code>patients.toString()</code> (sends <code>[object Object]</code>).</li><li>Outgoing and incoming nurse IDs come from the roster.</li><li><code>ACK</code> sets <code>acknowledged_at</code>, which today is set when the handover is sent.</li><li><code>S_PENDING</code> returns the handovers waiting for the incoming nurse.</li></ul></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill warn">Change</span><span class="path">IpDietV2/MarkConsumption</span></div><div class="api-b">
+      <div><span class="lbl">Add</span><p class="small muted">After MOP succeeds, insert a row into <code>ip_diet_consumption</code> (visit_reportid, meal_slot, order_id, consumed_pct, kcal_est, protein_est, recorded_by, recorded_at). NursingSummary and the timeline read from this table.</p></div>
+      <div><span class="lbl">Why</span><p class="small muted">Today, consumption, calories and protein exist only in the external MOP service. Neither the doctor nor reports can see them.</p></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill warn">Change</span><span class="path">Ipmanagement/Vitalsmonitoring · NursingNotes · Fluids</span></div><div class="api-b">
+      <div><span class="lbl">Changes</span><ul class="clean small"><li>Created-by from the token. Add <code>source</code> (WEB or MOBILE).</li><li>DEL becomes a soft delete with a reason.</li><li>Vitals: add <code>grbs</code> and <code>o2_flow</code>. The response adds <code>alerts[]</code> when values cross the doctor's thresholds.</li><li>Notes: add <code>note_category</code> (GENERAL, SBAR, INCIDENT, PROCEDURE), plus <code>reviewed_by</code> and <code>reviewed_at</code>.</li></ul></div>
+      <div><span class="lbl">Access</span><p class="small muted">A nurse-role user must hold a bed-access grant, or pass the allocation check, for this <code>visit_reportid</code>.</p></div></div></div>
+  </div>
+</section>
+
+<!-- NEW APIs -->
+<section id="apis-new">
+  <span class="eyebrow">New · NurseMobileController</span>
+  <h2>New APIs</h2>
+  <p class="intro">These live in one new controller shared by web and mobile, and follow the existing <code>POST /api/{Controller}/{Action}</code> convention. The doctor app uses <code>NursingSummary</code> and <code>DoctorOrders</code>.</p>
+  <div class="grid-api">
+    <div class="api"><div class="api-h"><span class="pill new">New</span><span class="path">NurseMobile/MyAllocation</span></div><div class="api-b">
+      <div><span class="lbl">Request</span><pre>{ }   // nurse from token, now()</pre></div>
+      <div><span class="lbl">Response</span><pre>{ "shift":"MORNING", "start":"06:00", "end":"14:00",
+  "is_charge": false,
+  "floors":[ {"floor_id":3,"name":"3rd floor",
+     "wards":[{"ward_id":31,"name":"Ward B","beds":18,"occupied":16}]},
+     {"floor_id":4,"name":"4th floor","wards":[…]} ],
+  "pending_handover_id": 912 }</pre></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill new">New</span><span class="path">NurseMobile/ScanBed</span></div><div class="api-b">
+      <div><span class="lbl">Request</span><pre>{ "qr":"HMSBED:v1:1307:9f2c1a…" }   // bedId + HMAC</pre></div>
+      <div><span class="lbl">200 · allowed</span><pre>{ "access_grant":"eyJ…", "expires_at":"2026-09-21T14:00",
+  "bed":{"bed_id":1307,"label":"3F-B07","ward":"Ward B","floor":3},
+  "patient":{"visit_reportid":55120,"name":"R. Kumar","uhid":"204518",
+    "age":62,"sex":"M","allergies":["Penicillin"],
+    "diagnosis":"Pneumonia","doctor":"Dr. Arjun","ip_day":3} }</pre>
+        <span class="lbl">403 · denied</span><pre>{ "reason_code":"NOT_ALLOCATED",   // | OFF_SHIFT | INVALID_QR
+  "bed_label":"2F-A01", "allotted_floors":["3rd floor","4th floor"],
+  "charge_nurse":{"name":"Sr. Meena","ext":"2204"} }</pre>
+        <span class="lbl">200 · special cases</span><pre>{ "state":"VACANT" }  |  { "state":"MOVED", "to_bed":"4F-B12", "allowed":true }</pre></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill new">New</span><span class="path">NurseMobile/FloorCensus</span></div><div class="api-b">
+      <div><span class="lbl">Request</span><pre>{ "floor_id":3 }   // 403 if not allotted</pre></div>
+      <div><span class="lbl">Response rows</span><pre>{ "bed_label":"3F-B07", "visit_reportid":55120, "name":"R. Kumar",
+  "age_sex":"62M", "diagnosis":"Pneumonia", "doctor":"Dr. Arjun",
+  "flags":["MED_OVERDUE","FEVER"], "next_due":"08:00", "state":"OCCUPIED" }</pre><p class="small muted">Built on <code>BedBoardByLocation</code> and <code>NurseConsolidatedBoard</code>.</p></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill new">New</span><span class="path">NurseMobile/PatientSnapshot</span></div><div class="api-b">
+      <div><span class="lbl">Request</span><pre>{ "visit_reportid":55120 }</pre></div>
+      <div><span class="lbl">Response (doctor summary for the nurse)</span><pre>{ "header":{…PHDR…}, "allergies":[…],
+  "last_vitals":{…}, "notify_if":{"temp_gt":38.5,"spo2_lt":94},
+  "doctor_note":{"by":"Dr. Arjun","at":"06:40","text":"…"},
+  "active_rx":[…LST…], "investigations":[{"test":"CBC","status":"PENDING"}],
+  "orders":[{"order_id":…,"text":"Nebulize q6h","status":"SENT"}],
+  "diet":{"type":"Soft","kcal_target":1800,"npo_from":null},
+  "instruction_to_nurse":"…" }</pre></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill new">New</span><span class="path">NurseMobile/DueList</span></div><div class="api-b">
+      <div><span class="lbl">Request</span><pre>{ "visit_reportid":55120 }  // or { "floor_id":3 } for the floor view</pre></div>
+      <div><span class="lbl">Response</span><pre>[ {"type":"MED","ref_id":88213,"title":"Inj Ceftriaxone 1 g IV",
+   "due":"08:00","overdue":true},
+  {"type":"VITALS","ref_id":7781,"title":"4-hourly vitals","due":"08:00"},
+  {"type":"TASK","ref_id":1902,"title":"Collect CBC sample","due":"09:00"} ]</pre></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill new">New</span><span class="path">NurseMobile/CoverRequest · CoverDecision</span></div><div class="api-b">
+      <div><span class="lbl">Request</span><pre>{ "bed_id":1201, "reason":"Covering break for Sr. Anu", "minutes":60 }
+// CoverDecision (charge nurse):
+{ "cover_id":77, "decision":"APPROVE" }</pre></div>
+      <div><span class="lbl">Effect</span><p class="small muted">An approved cover adds a temporary row that <code>fn_NurseCanAccessVisit</code> honours until it expires. The requesting nurse gets a push notification.</p></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill new">New</span><span class="path">NurseMobile/NursingSummary</span> <span class="pill info">Doctor app + web</span></div><div class="api-b">
+      <div><span class="lbl">Request</span><pre>{ "visit_reportid":55120, "hours":24 }</pre></div>
+      <div><span class="lbl">Response</span><pre>{ "vitals":[…series…], "mar":{"given":5,"due":3,"held":1,"missed":0,
+   "items":[{"med":"Paracetamol","status":"HELD","reason":"T 37.2"}]},
+  "io":{"in":1450,"out":1100,"balance":350},
+  "diet":{"kcal":1150,"target":1800,"meals":[{"slot":"LUNCH","pct":50}]},
+  "notes":[…], "tasks":{"done":6,"open":2},
+  "assessments":[{"type":"MORSE","score":45}], "last_handover":{…} }</pre></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill new">New</span><span class="path">DoctorOrders · Ins / List / Ack / Complete</span></div><div class="api-b">
+      <div><span class="lbl">Doctor creates</span><pre>{ "visit_reportid":55120, "order_type":"NURSING",  // NURSING|LAB|DIET|VITALS_FREQ|NOTIFY_IF
+  "text":"Nebulization Duolin q6h", "frequency":"Q6H", "priority":"ROUTINE" }</pre></div>
+      <div><span class="lbl">Nurse acknowledges / completes</span><pre>{ "order_id":3011, "action":"ACK" }   // → SEEN, nurse, time
+{ "order_id":3011, "action":"DONE", "note":"Given 10:05" }</pre><p class="small muted">Saving an order calls <code>GenerateTasksForOrder</code>, so the order also appears on the task board.</p></div></div></div>
+
+    <div class="api"><div class="api-h"><span class="pill new">New</span><span class="path">NursingAssessment · PushToken · NursingAlerts · BedQrLabels</span></div><div class="api-b">
+      <div><span class="lbl">NursingAssessment</span><pre>{ "visit_reportid":55120, "type":"BRADEN", // MORSE|PAIN|NUTRITION
+  "answers":{…}, "score":14 }  → next_due + task</pre>
+        <span class="lbl">PushToken</span><pre>{ "fcm_token":"…", "platform":"android" }</pre></div>
+      <div><span class="lbl">NursingAlerts</span><pre>{ "Dml":"LIST" | "ACK", "alert_id":… }
+// raised by: vitals over thresholds, HELD/REFUSED critical med,
+// missed dose > 60 min, meal refused twice, cover request</pre>
+        <span class="lbl">BedQrLabels (web admin)</span><pre>{ "ward_id":31 } → [{ "bed_label":"3F-B07", "qr":"HMSBED:v1:1307:…" }]</pre></div></div></div>
+  </div>
+</section>
+
+<!-- DB -->
+<section id="db">
+  <span class="eyebrow">Database</span>
+  <h2>New tables and columns</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Object</th><th>Type</th><th>Key columns</th><th>For</th></tr></thead>
+    <tbody>
+      <tr><td><code>master role</code>: <code>role_type</code></td><td>column</td><td>DOCTOR / NURSE / CHARGE_NURSE / NS</td><td>WN-01, MN-01</td></tr>
+      <tr><td><code>bed_managemet_details</code>: <code>qr_key</code></td><td>column</td><td>per-bed secret, used to sign the QR</td><td>Bed QR</td></tr>
+      <tr><td><code>fn_NurseCanAccessVisit</code></td><td>function</td><td>nurse_user_id, visit_reportid, at → roster (duty date or standing range, shift window, floor/ward/current ward, PUBLISHED) OR approved cover OR charge/NS read</td><td>WN-02</td></tr>
+      <tr><td><code>nurse_bed_access_log</code></td><td>table</td><td>nurse_user_id, bed_id, visit_reportid, result, reason_code, device, at</td><td>Audit of every scan</td></tr>
+      <tr><td><code>nurse_cover_request</code></td><td>table</td><td>requester, bed_id or ward_id, reason, minutes, status, decided_by, valid_until</td><td>Temporary access</td></tr>
+      <tr><td><code>doctor_order</code>, <code>doctor_order_event</code></td><td>tables</td><td>order_type, text, frequency, thresholds_json, status; event(action, by, at)</td><td>WN-07, WD-07</td></tr>
+      <tr><td><code>ip_diet_consumption</code>, <code>ip_nutrition_assessment</code></td><td>tables</td><td>meal_slot, consumed_pct, kcal, protein; risk level, kcal/protein requirement</td><td>WN-15</td></tr>
+      <tr><td><code>nursing_assessment</code></td><td>table</td><td>type, score, answers_json, next_due_at, by</td><td>WN-16</td></tr>
+      <tr><td><code>nursing_alert</code>, <code>device_push_token</code></td><td>tables</td><td>rule, visit_reportid, target_user, severity, ack_at; user, token, platform</td><td>WD-06, MD-03</td></tr>
+      <tr><td><code>medication_delivery_schedule</code>: fix fill of <code>wardid</code>, <code>branch_id</code>, <code>floorid</code></td><td>data + SP</td><td>backfill from the bed at dose time</td><td>WN-05</td></tr>
+      <tr><td>Clinical tables: <code>is_deleted</code>, <code>deleted_by</code>, <code>delete_reason</code>, <code>source</code></td><td>columns</td><td>vitals, fluids, notes, diabetic chart</td><td>WN-17</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<!-- ORDER -->
+<section id="order">
+  <span class="eyebrow">Sequence</span>
+  <h2>Build order</h2>
+  <div class="cols2">
+    <div class="card"><span class="sev p0" style="width:max-content">Sprint 1 · Foundations</span><ul class="clean small"><li><code>role_type</code> and login changes (WN-01, MN-01)</li><li><code>fn_NurseCanAccessVisit</code> and identity from the token (WN-02, WN-03)</li><li>MyAllocation, ScanBed, BedQrLabels, access log</li><li>App: shift start, home, scanner, denied and allowed screens</li></ul></div>
+    <div class="card"><span class="sev p0" style="width:max-content">Sprint 2 · Bedside</span><ul class="clean small"><li>FloorCensus, PatientSnapshot, DueList</li><li>MAR standardized on NurseConsole_MAR (WN-04, 05, 06)</li><li>App: patient hub, doctor summary, vitals, MAR, I/O, notes</li><li>OP vitals single store (WN-09, WD-04, 05)</li></ul></div>
+    <div class="card"><span class="sev p1" style="width:max-content">Sprint 3 · Close the loop</span><ul class="clean small"><li>NursingSummary on web and in the doctor app (WD-01, MD-01)</li><li>Diet mirror (WN-15), handover fix (WN-13)</li><li>Alerts and push (WD-06, MD-03)</li></ul></div>
+    <div class="card"><span class="sev p2" style="width:max-content">Sprint 4 · Maturity</span><ul class="clean small"><li>DoctorOrders with acknowledgement (WN-07, WD-07, MD-04, MD-07)</li><li>Assessments (WN-16, MN-12)</li><li>Task engine jobs (WN-11); OP procedure tasks</li><li>Offline queue; wristband and medicine barcode</li></ul></div>
+  </div>
+</section>
+
+<footer>Sources: <code>DoctorAPI/Controllers/{NursingAutomation, NursingLocation, NurseConsole, IpDietV2, Ipmanagement, DisplayBoard}Controller.cs</code>, <code>DataAccessLayer/Classes/{DNursingAutomation, DNurseConsole}.cs</code>, web <code>Content/js/ApplicationJs/*</code>, the DB audit dated 2026-08-13, and <code>DoctorApp/lib/features/{nurse, nurse_superintendent, my-ip-patients}</code>. Request and response shapes for new APIs are proposals. Field names follow existing conventions.</footer>
+</div>
+<script>
+document.querySelectorAll('[role="tablist"]').forEach(function(list){
+  var tabs=list.querySelectorAll('[role="tab"]');
+  tabs.forEach(function(t){t.addEventListener('click',function(){
+    tabs.forEach(function(o){o.setAttribute('aria-selected',o===t?'true':'false');document.getElementById(o.getAttribute('aria-controls')).hidden=(o!==t);});
+  });});
+});
+</script>
+</body>
+</html>

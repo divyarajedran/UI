@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nurse QR Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,650&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#eef0f4; --surface:#ffffff; --sunk:#e6e9ef; --ink:#172033; --ink2:#4a556b; --ink3:#7a8499; --line:#d6dbe4; --navy:#233b77;
+  --ok:#17804f; --ok-bg:#e2f3ea; --warn:#9a6200; --warn-bg:#fbf0d9; --bad:#b3261e; --bad-bg:#fbe5e3; --info:#2b5fb3; --info-bg:#e3ecfa; --new:#6b3fa0; --new-bg:#efe6f8;
+  --serif:"Fraunces",Georgia,serif; --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  color-scheme:dark; --bg:#0d121c; --surface:#161d2b; --sunk:#1e2638; --ink:#e7ebf3; --ink2:#b3bccd; --ink3:#8792a8; --line:#2c3549; --navy:#8fa8e8;
+  --ok:#5fcf97; --ok-bg:#15352a; --warn:#e8b457; --warn-bg:#3a2d12; --bad:#f08a80; --bad-bg:#3d1c1a; --info:#86aef0; --info-bg:#1c2c4a; --new:#c6a2f0; --new-bg:#2e2342;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark; --bg:#0d121c; --surface:#161d2b; --sunk:#1e2638; --ink:#e7ebf3; --ink2:#b3bccd; --ink3:#8792a8; --line:#2c3549; --navy:#8fa8e8;
+  --ok:#5fcf97; --ok-bg:#15352a; --warn:#e8b457; --warn-bg:#3a2d12; --bad:#f08a80; --bad-bg:#3d1c1a; --info:#86aef0; --info-bg:#1c2c4a; --new:#c6a2f0; --new-bg:#2e2342;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);margin:0}
+.wrap{max-width:1320px;margin:0 auto;padding-inline:18px;padding-block:20px 60px}
+.docnav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.docnav a{font-size:13px;text-decoration:none;color:var(--ink2);padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface)}
+.docnav a[aria-current="page"]{background:var(--navy);border-color:var(--navy);color:var(--surface)}
+.top{display:flex;justify-content:space-between;align-items:end;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+h1{font:650 clamp(26px,4vw,36px)/1.15 var(--serif);margin:0}
+.top p{margin:4px 0 0;color:var(--ink2);max-width:70ch}
+.modes{display:flex;gap:6px}
+.modes button,.navlist button{font:600 13px/1 var(--sans);cursor:pointer}
+.modes button{padding:9px 14px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink2)}
+.modes button[aria-pressed="true"]{background:var(--navy);color:var(--surface);border-color:var(--navy)}
+.stage{display:grid;grid-template-columns:250px 360px minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:1080px){.stage{grid-template-columns:1fr;justify-items:center}.navlist{display:none!important}.spec{width:100%;max-width:640px}.pick{display:block!important}}
+.pick{display:none;width:100%;max-width:360px}
+.pick select{width:100%;font:600 14px var(--sans);padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.navlist{display:grid;gap:14px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;padding-right:4px}
+.navgrp{display:grid;gap:2px}
+.navgrp h2{font:700 11px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin:0 0 6px}
+.navlist button{display:flex;gap:8px;align-items:center;text-align:left;padding:7px 9px;border-radius:7px;border:0;background:transparent;color:var(--ink2);font-weight:500;width:100%}
+.navlist button:hover{background:var(--surface)}
+.navlist button[aria-current="true"]{background:var(--surface);color:var(--navy);font-weight:700;box-shadow:inset 3px 0 0 var(--navy)}
+.navlist .n{font:600 10.5px/1 var(--mono);color:var(--ink3);width:22px}
+button:focus-visible,select:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #4c7bd9;outline-offset:2px}
+.spec{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;display:grid;gap:14px;position:sticky;top:12px}
+.spec .g{font:700 11px/1 var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--navy)}
+.spec h3{font:650 24px/1.2 var(--serif);margin:0}
+.spec p{margin:0;color:var(--ink2)}
+.spec .lbl{font:700 11px/1 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.apis{display:grid;gap:6px}
+.apirow{display:grid;grid-template-columns:auto 1fr;gap:4px 8px;align-items:start;padding:8px 10px;border-radius:8px;background:var(--sunk)}
+.apirow code{font:600 12px/1.4 var(--mono);color:var(--ink);word-break:break-word}
+.apirow span.d{grid-column:2;font-size:12.5px;color:var(--ink2)}
+.tag{font:700 10px/1 var(--mono);padding:4px 6px;border-radius:4px}
+.tag.NEW{background:var(--new-bg);color:var(--new)} .tag.REUSE{background:var(--info-bg);color:var(--info)} .tag.CHG{background:var(--warn-bg);color:var(--warn)} .tag.FIX{background:var(--bad-bg);color:var(--bad)}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;font-size:13.5px}
+.kv dt{color:var(--ink3);font-weight:600}
+.kv dd{margin:0}
+.rules{margin:0;padding-left:18px;display:grid;gap:4px;color:var(--ink2);font-size:13.5px}
+.gapref{display:flex;gap:6px;flex-wrap:wrap}
+.gapref span{font:600 11px/1 var(--mono);padding:4px 7px;border-radius:5px;background:var(--bad-bg);color:var(--bad)}
+.flowhint{font-size:12.5px;color:var(--ink3);border-top:1px dashed var(--line);padding-top:10px}
+
+/* ---------- phone (fixed app look, light) ---------- */
+.device{width:360px;max-width:100%;background:#0f1629;border-radius:38px;padding:10px;box-shadow:0 24px 50px -24px rgba(15,22,41,.55)}
+.scr{position:relative;background:#f3f5fa;border-radius:29px;height:720px;overflow:hidden;display:flex;flex-direction:column;color:#172033;font:13px/1.4 var(--sans)}
+.sbar{display:flex;justify-content:space-between;padding:10px 20px 4px;font:600 11.5px/1 var(--sans);color:#172033;flex:0 0 auto}
+.sbar.dark{color:#fff;background:#233b77}
+.ab{background:#233b77;color:#fff;padding:8px 14px 14px;display:flex;gap:8px;align-items:flex-start;flex:0 0 auto}
+.ab .t{font:700 16px/1.25 var(--sans)} .ab .s{font-size:11.5px;opacity:.82;margin-top:2px}
+.bk{background:rgba(255,255,255,.14);border:0;color:#fff;width:30px;height:30px;border-radius:8px;font:600 20px/1 var(--sans);cursor:pointer;flex:0 0 auto}
+.body{padding:12px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1 1 auto}
+.card{background:#fff;border-radius:12px;padding:12px;display:grid;gap:7px;border:1px solid #e0e5ee}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lb{font:700 10.5px/1.2 var(--sans);letter-spacing:.07em;text-transform:uppercase;color:#6b7590}
+.mut{color:#6b7590;font-size:12px}
+.big{font:700 22px/1 var(--sans)}
+.c{display:inline-flex;align-items:center;font:700 10.5px/1 var(--sans);padding:4px 7px;border-radius:99px;background:#e3e8f4;color:#233b77;white-space:nowrap}
+.c.g{background:#e2f3ea;color:#17804f} .c.r{background:#fbe5e3;color:#b3261e} .c.a{background:#fbf0d9;color:#9a6200} .c.p{background:#efe6f8;color:#6b3fa0} .c.x{background:#eceff4;color:#6b7590}
+.chips{display:flex;gap:5px;flex-wrap:wrap}
+.btn{border:0;cursor:pointer;background:#233b77;color:#fff;border-radius:10px;padding:12px;font:700 13.5px/1 var(--sans);text-align:center;width:100%}
+.btn.gh{background:#fff;color:#233b77;border:1.5px solid #233b77}
+.btn.gr{background:#17804f} .btn.rd{background:#b3261e} .btn.sm{padding:8px 10px;font-size:12px;width:auto}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.tile{background:#fff;border:1px solid #e0e5ee;border-radius:12px;padding:10px;display:grid;gap:4px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.tile:hover{border-color:#233b77}
+.tile b{font-size:13px}
+.fld{display:grid;gap:3px}
+.fld label{font:700 10.5px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:#6b7590}
+.fld input,.fld select,.fld textarea{font:600 15px/1.2 var(--mono);color:#172033;background:#fff;border:1.5px solid #d5dbe7;border-radius:9px;padding:9px 10px;width:100%}
+.fld textarea{font:500 13px/1.4 var(--sans);min-height:80px;resize:vertical}
+.fld select{font:600 13px var(--sans)}
+.fld input.hi{border-color:#b3261e;color:#b3261e;background:#fff6f5}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{flex:1 1 auto;border:1.5px solid #d5dbe7;background:#fff;border-radius:8px;padding:8px 6px;font:600 12px/1 var(--sans);color:#4a556b;cursor:pointer}
+.seg button.on{background:#233b77;border-color:#233b77;color:#fff}
+.alertbox{background:#fbe5e3;border:1px solid #f1c1bb;border-radius:10px;padding:10px;color:#8f1d16;font-size:12.5px;display:grid;gap:3px}
+.okbox{background:#e2f3ea;border:1px solid #bfe3cf;border-radius:10px;padding:10px;color:#11643d;font-size:12.5px}
+.warnbox{background:#fbf0d9;border:1px solid #efd9a8;border-radius:10px;padding:10px;color:#7a4d00;font-size:12.5px}
+.pbar{background:#fff;border-bottom:1px solid #e0e5ee;padding:10px 14px;display:grid;gap:6px;flex:0 0 auto}
+.pbar b{font-size:14px}
+.navb{display:flex;justify-content:space-around;border-top:1px solid #e0e5ee;background:#fff;padding:6px 4px 14px;flex:0 0 auto}
+.navb button{background:none;border:0;display:grid;justify-items:center;gap:2px;font:600 10.5px/1 var(--sans);color:#8a93a8;cursor:pointer;padding:4px 8px;position:relative}
+.navb button .i{font-size:17px;line-height:1}
+.navb button.on{color:#233b77}
+.navb .dot{position:absolute;top:0;right:6px;background:#b3261e;color:#fff;border-radius:99px;font:700 9px/1 var(--sans);padding:2px 4px}
+.list{display:grid;gap:8px}
+.bed{background:#fff;border:1px solid #e0e5ee;border-radius:12px;padding:10px 12px;display:grid;gap:3px;cursor:pointer;text-align:left;font:inherit;color:inherit;width:100%}
+.bed:hover{border-color:#233b77}
+.scanwrap{flex:1;background:#0f1629;color:#fff;display:flex;flex-direction:column;gap:12px;padding:14px;overflow-y:auto}
+.viewfinder{margin:4px auto;width:210px;height:210px;border-radius:18px;background:radial-gradient(circle at 50% 40%,#28324b,#0b1020);position:relative;display:grid;place-items:center;flex:0 0 auto}
+.viewfinder::before{content:"";position:absolute;inset:26px;border:3px solid #7fe0b0;border-radius:14px;clip-path:polygon(0 0,30% 0,30% 6%,6% 6%,6% 30%,0 30%,0 70%,6% 70%,6% 94%,30% 94%,30% 100%,70% 100%,70% 94%,94% 94%,94% 70%,100% 70%,100% 30%,94% 30%,94% 6%,70% 6%,70% 0,100% 0,100% 100%,0 100%)}
+.viewfinder::after{content:"";position:absolute;left:34px;right:34px;top:50%;height:2px;background:#7fe0b0;box-shadow:0 0 14px #7fe0b0}
+@media (prefers-reduced-motion:no-preference){.viewfinder::after{animation:sweep 2.4s ease-in-out infinite}@keyframes sweep{0%,100%{top:28%}50%{top:72%}}}
+.simbtn{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;text-align:left;background:#1b2440;border:1px solid #2e3a5e;color:#fff;border-radius:10px;padding:9px 11px;cursor:pointer;font:inherit}
+.simbtn:hover{border-color:#7fe0b0}
+.simbtn .q{grid-row:span 2;width:28px;height:28px;border-radius:5px;background:repeating-linear-gradient(90deg,#fff 0 3px,#1b2440 3px 6px),#fff}
+.simbtn small{color:#9aa6c4;font-size:11px}
+.bigicon{margin:14px auto 4px;width:76px;height:76px;border-radius:50%;display:grid;place-items:center;font:700 36px/1 var(--sans)}
+.center{text-align:center;display:grid;gap:8px}
+.toast{position:absolute;left:14px;right:14px;bottom:78px;background:#172033;color:#fff;border-radius:10px;padding:11px 13px;font-size:12.5px;box-shadow:0 8px 20px rgba(0,0,0,.25);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;pointer-events:none;z-index:5}
+.toast.show{opacity:1;transform:none}
+.tl{display:grid;gap:0}
+.tl .it{display:grid;grid-template-columns:44px 1fr;gap:8px;padding:8px 0;border-bottom:1px dashed #e0e5ee}
+.tl .it:last-child{border-bottom:0}
+.tl .tm{font:600 11px/1.4 var(--mono);color:#6b7590}
+.mono{font-family:var(--mono)}
+.bar{height:8px;border-radius:99px;background:#e3e8f4;overflow:hidden}
+.bar i{display:block;height:100%;background:#17804f;border-radius:99px}
+.sbarline{display:flex;gap:6px;align-items:center}
+.grid-all{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:26px 20px}
+.grid-all figure{margin:0;display:grid;gap:8px;justify-items:center}
+.grid-all figcaption{font:600 13px/1.3 var(--sans);color:var(--ink2);text-align:center}
+.grid-all figcaption b{color:var(--ink);display:block}
+.grid-all .device{width:300px;transform-origin:top center}
+.grid-all .scr{height:600px}
+.legendline{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--ink2)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="docnav" aria-label="Documents">
+  <a href="nursing-flow-blueprint.html">1 · Blueprint</a>
+  <a href="nursing-gaps-and-apis.html">2 · Gaps &amp; API spec</a>
+  <a href="nurse-mobile-prototype.html" aria-current="page">3 · Nurse app (mobile)</a>
+  <a href="doctor-console-web.html">4 · Doctor console (web)</a>
+  <a href="doctor-mobile-prototype.html" style="font-size:13px;text-decoration:none;padding:6px 12px;border-radius:8px;border:1px solid var(--line);color:var(--ink2);background:var(--surface)">5 · Doctor app (mobile)</a>
+</nav>
+<div class="top">
+  <div>
+    <h1>Nurse QR Concept (detailed demo)</h1>
+    <p>A clickable walkthrough of the Flutter nursing flow: floor-locked bed QR access, bedside charting, doctor summary, handover, OP triage, charge-nurse cover, and the doctor's view of nursing work. All data is example data. Tap inside the phone, or pick a screen on the left.</p>
+  </div>
+  <div class="modes" role="group" aria-label="View mode">
+    <button id="m-flow" aria-pressed="true">Interactive</button>
+    <button id="m-all" aria-pressed="false">All screens</button>
+    <button id="m-reset" aria-pressed="false" title="Reset demo data">Reset</button>
+  </div>
+</div>
+
+<div id="flowView" class="stage">
+  <nav class="navlist" id="navlist" aria-label="Screens"></nav>
+  <div style="display:grid;gap:12px;justify-items:center;width:100%">
+    <div class="pick"><label for="pickSel" class="lb" style="display:block;margin-bottom:6px;color:var(--ink3)">Jump to screen</label><select id="pickSel"></select></div>
+    <div class="device"><div class="scr" id="screen"></div></div>
+    <div class="legendline"><span class="tag NEW">NEW</span>new API <span class="tag REUSE">REUSE</span>existing API <span class="tag CHG">CHG</span>existing, needs change</div>
+  </div>
+  <aside class="spec" id="spec" aria-live="polite"></aside>
+</div>
+<div id="allView" class="grid-all" hidden></div>
+</div>
+
+<script>
+/* ================= demo state ================= */
+function fresh(){return {
+  cur:'login', stack:[], granted:false, floor:3, cover:'none', hinAck:false, handoverSent:false, docAck:false, marFilter:'due', ioKind:'in', noteCat:'General', lunchPct:null, sel:1, opSel:'T-12', holdMode:false,
+  morse:{0:0,1:15,2:0,3:20,4:10,5:0},
+  orders:[{id:1,text:'Nebulization Duolin q6h',by:'Dr. Arjun',at:'06:45',status:'SENT',who:''}],
+  vitals:[{at:'00:00',t:37.9,s:94,p:92,bp:'130/82',rr:20,by:'Sr. Anu'},{at:'04:00',t:38.2,s:93,p:96,bp:'132/84',rr:22,by:'Sr. Anu'}],
+  meds:[
+    {id:1,name:'Inj. Ceftriaxone 1 g',route:'IV',freq:'BD',time:'08:00',status:'DUE',overdue:true,warn:'Cephalosporin with a penicillin allergy. Dr. Arjun acknowledged at 06:40.'},
+    {id:2,name:'Tab. Paracetamol 650 mg',route:'Oral',freq:'SOS if T > 38.5 °C',time:'08:00',status:'DUE'},
+    {id:3,name:'Tab. Pantoprazole 40 mg',route:'Oral',freq:'OD before food',time:'06:00',status:'GIVEN',by:'Priya',at:'06:05'},
+    {id:4,name:'Inj. Actrapid 6 U',route:'SC',freq:'TDS pre-meal',time:'07:30',status:'GIVEN',by:'Priya',at:'07:32'},
+    {id:5,name:'Syp. Ambroxol 10 mL',route:'Oral',freq:'TDS',time:'14:00',status:'SCHEDULED'}],
+  io:[{k:'in',type:'IV fluid · NS',ml:1000,at:'00:00'},{k:'in',type:'Oral',ml:450,at:'06:00'},{k:'out',type:'Urine',ml:1100,at:'06:00'}],
+  meals:[{slot:'Breakfast',time:'08:00',status:'Delivered',pct:75,kcal:450},{slot:'Lunch',time:'13:00',status:'Delivered',pct:null,kcal:650},{slot:'Evening snack',time:'16:30',status:'Scheduled',pct:null,kcal:150},{slot:'Dinner',time:'19:30',status:'Scheduled',pct:null,kcal:550}],
+  notes:[{cat:'General',at:'04:10',by:'Sr. Anu',text:'Febrile 38.2 °C, tepid sponging given. Paracetamol given at 02:00. Cough with scanty sputum.'}],
+  tasks:[{id:1,t:'Collect CBC sample',src:'Lab order · Dr. Arjun',due:'09:00',st:'OPEN'},{id:2,t:'Nebulization Duolin',src:'Doctor order',due:'10:00',st:'OPEN'},{id:3,t:'Position change (2-hourly)',src:'Care plan · Braden 14',due:'08:00',st:'OPEN'},{id:4,t:'Vitals (4-hourly)',src:'Template · ward B',due:'08:00',st:'OPEN'},{id:5,t:'Admission Braden score',src:'On admission',due:'Done 22:10',st:'DONE'}],
+  opq:[{tok:'T-12',name:'A. Joseph · 34 M',doc:'Dr. Arjun',st:'WAITING'},{tok:'T-13',name:'P. Lakshmi · 29 F',doc:'Dr. Arjun',st:'WAITING'},{tok:'T-11',name:'L. Mary · 58 F',doc:'Dr. Arjun',st:'VITALS_DONE'},{tok:'T-10',name:'K. Rao · 41 M',doc:'Dr. Arjun',st:'WITH_DOCTOR'}]
+};}
+let S=fresh();
+
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function sb(dark){return `<div class="sbar${dark?' dark':''}"><span>${clock()}</span><span>●●● 5G ▮</span></div>`}
+function clock(){return ({login:'06:02',shift:'06:05',hin:'06:08',home:'07:10',floors:'07:12',scan:'07:15',denied:'07:15',cover:'07:16',approve:'07:17',vacant:'07:18',moved:'07:18',hub:'07:21',docsum:'07:22',vitals:'07:24',vtrend:'07:26',mar:'08:02',admin:'08:03',io:'10:40',diet:'13:25',notes:'10:15',assess:'09:30',tasks:'09:05',alerts:'09:10',handover:'13:40',profile:'13:55',opq:'09:40',opv:'09:42',dlist:'09:15',dnurse:'09:16',d_opq:'09:45',d_opcase:'09:48',dhist:'09:20',dday:'09:21',dmarh:'09:22',dprev:'09:23',dorder:'09:18',dalert:'07:25'})[S.cur]||'07:00'}
+function ab(t,s,noBack){return `<div class="ab">${noBack?'':'<button class="bk" onclick="back()" aria-label="Back">‹</button>'}<div><div class="t">${t}</div>${s?`<div class="s">${s}</div>`:''}</div></div>`}
+function ch(t,k){return `<span class="c ${k||''}">${t}</span>`}
+function nav(a){const unread=S.orders.filter(o=>o.status==='SENT').length+(S.cover==='approved'?1:0)+1;
+  const it=[['home','⌂','Home'],['floors','▦','Floors'],['scan','⌗','Scan'],['tasks','✓','Tasks'],['alerts','◉','Alerts']];
+  return `<div class="navb">${it.map(([id,i,l])=>`<button class="${a===id?'on':''}" onclick="go('${id}')"><span class="i">${i}</span>${l}${id==='alerts'&&unread?`<span class="dot">${unread}</span>`:''}</button>`).join('')}</div>`}
+function dnav(a){const it=[['d_opq','⌂','OP'],['dlist','☰','IP'],['dalert','◉','Alerts'],['dorder','＋','Orders']];
+  return `<div class="navb">${it.map(([id,i,l])=>`<button class="${a===id?'on':''}" onclick="go('${id}')"><span class="i">${i}</span>${l}</button>`).join('')}</div>`}
+function pbar(){return `<div class="pbar"><div class="row"><b>R. Kumar · 62 M</b>${S.granted?ch('Bed scanned ✓','g'):ch('View only','x')}</div><span class="mut">3F · Ward B · Bed 07 · UHID 204518 · IP day 3 · Dr. Arjun</span><div class="chips">${ch('Allergy: Penicillin','r')}${ch('Fall risk · Morse '+morseScore(),'a')}${ch('Soft diabetic diet')}</div></div>`}
+function lastV(){return S.vitals[S.vitals.length-1]}
+function kcal(){return S.meals.reduce((a,m)=>a+(m.pct!=null?Math.round(m.kcal*m.pct/100):0),0)}
+function ioTot(k){return S.io.filter(x=>x.k===k).reduce((a,x)=>a+x.ml,0)}
+function marCount(st){return S.meds.filter(m=>m.status===st).length}
+function morseScore(){return Object.values(S.morse).reduce((a,b)=>a+b,0)}
+function needScan(next){if(S.granted){go(next);return}toast('Scan the bed QR before recording. Viewing is allowed without a scan.');setTimeout(()=>go('scan'),900)}
+let tt;function toast(m){const t=$('#screen .toast');if(!t)return;t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2300)}
+
+/* ================= screens ================= */
+const SC={};
+
+SC.login=()=>`${sb()}<div class="body" style="justify-content:center;gap:14px;padding:26px">
+  <div class="center"><div style="width:62px;height:62px;border-radius:16px;background:#233b77;color:#fff;display:grid;place-items:center;margin:0 auto;font:700 26px var(--serif)">H</div>
+  <b style="font-size:20px">HMS Care</b><span class="mut">Doctors &amp; nursing staff</span></div>
+  <div class="fld"><label for="u">Username</label><input id="u" value="priya.s"></div>
+  <div class="fld"><label for="pw">Password</label><input id="pw" type="password" value="password"></div>
+  <button class="btn" onclick="go('shift')">Sign in</button>
+  <button class="btn gh" onclick="toast('Fingerprint verified');setTimeout(()=>go('shift'),700)">Use fingerprint</button>
+  <div class="card" style="background:#f7f8fb"><span class="lb">Demo: role-based routing</span><span class="mut">The login returns <b>role_type</b>. NURSE goes to shift start, and DOCTOR goes to the IP patients list.</span><button class="btn sm gh" onclick="go('dlist')">Sign in as Dr. Arjun (doctor)</button></div>
+</div>`;
+
+SC.shift=()=>`${sb(1)}${ab('Start your shift','Sun 21 Sep 2026',true)}<div class="body">
+  <div class="card"><span class="lb">Duty roster · published by NS</span><div class="row"><b style="font-size:16px">Morning shift</b>${ch('06:00 – 14:00','g')}</div><span class="mut">Staff Nurse · Priya S · ID 412</span></div>
+  <div class="card"><span class="lb">You are allotted</span>
+    <div class="row"><div><b>3rd floor · Ward B</b><div class="mut">18 beds · 16 occupied</div></div>${ch('Primary','g')}</div>
+    <div class="row"><div><b>4th floor · Ward C</b><div class="mut">14 beds · 12 occupied</div></div>${ch('Primary','g')}</div>
+    <span class="mut">You can only open patients on these floors. Other floors need an approved cover.</span></div>
+  <div class="card" style="border-color:${S.hinAck?'#bfe3cf':'#efd9a8'}"><div class="row"><span class="lb">Night handover</span>${S.hinAck?ch('Acknowledged','g'):ch('Pending','a')}</div><span>From <b>Sr. Anu</b> · 28 patients · 3 flagged</span>
+    ${S.hinAck?'':'<button class="btn gh" onclick="go(\'hin\')">Read &amp; acknowledge</button>'}</div>
+  <button class="btn" ${S.hinAck?'':'disabled'} onclick="go('home')">Start shift</button>
+  ${S.hinAck?'':'<span class="mut" style="text-align:center">Acknowledge the handover to start your shift.</span>'}
+</div>`;
+
+SC.hin=()=>`${sb(1)}${ab('Handover from night shift','Sr. Anu → Priya · 3F + 4F')}<div class="body">
+  <div class="warnbox"><b>3 patients flagged</b> by the outgoing nurse</div>
+  ${[['3F-B07','R. Kumar, 62M','Febrile 38.2 °C overnight, paracetamol given at 02:00.','Penicillin allergy. DM2 on insulin.','SpO₂ 93% on room air. Poor oral intake.','Recheck temperature at 08:00. CBC sample due at 09:00. Watch SpO₂.'],
+     ['3F-B08','S. Devi, 45F','Post-op day 1, lap cholecystectomy.','No known allergies.','Pain score 4. Drain 60 mL serous.','Start soft diet at lunch if tolerated. Mobilize.'],
+     ['4F-C03','M. Iqbal, 71M','CHF, on IV furosemide.','Fluid restriction 1.2 L.','Balance −600 mL. Weight 68.4 kg.','Weigh at 06:00. NPO after 22:00 for echo.']]
+    .map(p=>`<div class="card"><div class="row"><b>${p[0]} · ${p[1]}</b>${ch('SBAR','p')}</div>
+      <div class="mut"><b>S</b> ${p[2]}</div><div class="mut"><b>B</b> ${p[3]}</div><div class="mut"><b>A</b> ${p[4]}</div><div class="mut"><b>R</b> ${p[5]}</div></div>`).join('')}
+  <span class="mut">+ 25 stable patients (tap to expand)</span>
+  <button class="btn gr" onclick="S.hinAck=true;toast('Handover acknowledged at 06:08');setTimeout(back,700)">Acknowledge handover</button>
+</div>`;
+
+SC.home=()=>{const due=S.meds.filter(m=>m.status==='DUE').length;return `${sb(1)}${ab('Good morning, Priya','Staff Nurse · Morning 06:00–14:00',true)}<div class="body">
+  <div class="card"><span class="lb">Allotted this shift</span><div class="chips">${ch('3rd floor · Ward B · 16 patients','g')}${ch('4th floor · Ward C · 12 patients','g')}</div></div>
+  <button class="btn" onclick="go('scan')" style="padding:16px;font-size:15px">⌗  Scan bed QR</button>
+  <div class="two">
+    <button class="tile" onclick="go('floors')"><span class="lb">Meds due</span><span class="big">${due+10}</span>${ch('3 overdue','r')}</button>
+    <button class="tile" onclick="go('floors')"><span class="lb">Vitals due</span><span class="big">9</span>${ch('next 30 min','a')}</button>
+    <button class="tile" onclick="go('tasks')"><span class="lb">Tasks</span><span class="big">${S.tasks.filter(t=>t.st==='OPEN').length+3}</span>${ch('2 high')}</button>
+    <button class="tile" onclick="go('alerts')"><span class="lb">New orders</span><span class="big">${S.orders.filter(o=>o.status==='SENT').length}</span>${ch('from doctors','p')}</button>
+  </div>
+  <div class="two"><button class="tile" onclick="go('opq')"><b>OP triage queue</b><span class="mut">2 waiting · Dr. Arjun</span></button><button class="tile" onclick="go('handover')"><b>End-of-shift handover</b><span class="mut">${S.handoverSent?'Sent ✓':'Due 13:45'}</span></button></div>
+</div>${nav('home')}<div class="toast"></div>`};
+
+SC.floors=()=>{const beds=S.floor===3?[
+  ['B-07','R. Kumar · 62 M','Pneumonia · Dr. Arjun · Day 3',[['Med overdue','r'],['Fever','r']]],
+  ['B-08','S. Devi · 45 F','Post-op lap chole · Day 1',[['Vitals due','a']]],
+  ['B-09','Vacant','Cleaned 06:40',[['Vacant','x']]],
+  ['B-10','M. Thomas · 71 M','COPD · NPO after 22:00',[['On track','g']]],
+  ['B-11','A. Begum · 55 F','Cellulitis leg · Day 2',[['Dressing 10:00','a']]]]:[
+  ['C-03','M. Iqbal · 71 M','CHF · fluid restriction 1.2 L',[['Balance −600','a']]],
+  ['C-04','R. Nair · 38 F','Dengue · platelets watch',[['Vitals due','a']]],
+  ['C-05','G. Singh · 66 M','Post-op TKR · Day 2',[['On track','g']]]];
+  return `${sb(1)}${ab('My floors','Only your allotted floors are listed',true)}<div class="body">
+  <div class="seg"><button class="${S.floor===3?'on':''}" onclick="S.floor=3;render()">3rd floor · 16</button><button class="${S.floor===4?'on':''}" onclick="S.floor=4;render()">4th floor · 12</button></div>
+  <div class="chips">${ch('All')}${ch('Due now','a')}${ch('Critical','r')}${ch('Admitted today','x')}</div>
+  <div class="list">${beds.map(b=>`<button class="bed" onclick="${b[1]==='Vacant'?"go('vacant')":(b[0]==='B-07'?"go('hub')":"toast('Demo: open 3F · B-07 (R. Kumar)')")}"><div class="row"><b>${S.floor}F · ${b[0]} · ${b[1]}</b><span class="chips">${b[3].map(x=>ch(x[0],x[1])).join('')}</span></div><span class="mut">${b[2]}</span></button>`).join('')}</div>
+  <span class="mut" style="text-align:center">2nd floor isn't listed because you aren't allotted there.</span>
+</div>${nav('floors')}<div class="toast"></div>`};
+
+SC.scan=()=>`${sb(1)}<div class="ab" style="padding-bottom:10px"><button class="bk" onclick="back()" aria-label="Back">‹</button><div><div class="t">Scan bed QR</div><div class="s">Point at the label on the bed head-board</div></div></div>
+<div class="scanwrap">
+  <div class="viewfinder"></div>
+  <span style="text-align:center;color:#9aa6c4;font-size:12px">Demo: pick which label the camera "sees"</span>
+  <button class="simbtn" onclick="scanRes('denied')"><span class="q"></span><b>2F · Ward A · Bed 01</b><small>Not in your allocation</small></button>
+  <button class="simbtn" onclick="scanRes('ok')"><span class="q"></span><b>3F · Ward B · Bed 07</b><small>Allotted floor · R. Kumar</small></button>
+  <button class="simbtn" onclick="scanRes('vacant')"><span class="q"></span><b>3F · Ward B · Bed 09</b><small>Vacant bed</small></button>
+  <button class="simbtn" onclick="scanRes('moved')"><span class="q"></span><b>3F · Ward B · Bed 04</b><small>Patient transferred to 4F</small></button>
+  <button class="simbtn" onclick="scanRes('bad')"><span class="q"></span><b>Damaged / foreign QR</b><small>Signature check fails</small></button>
+  <button class="btn gh" style="background:transparent;color:#fff;border-color:#55618a" onclick="toast('Manual code goes through the same server check')">Enter bed code manually</button>
+</div><div class="toast"></div>`;
+function scanRes(r){if(r==='ok'){S.granted=true;toast('Access granted · valid until 14:00');setTimeout(()=>go('hub'),650)}else if(r==='denied')go('denied');else if(r==='vacant')go('vacant');else if(r==='moved')go('moved');else toast('Invalid QR. This label is not an HMS bed label.')}
+
+SC.denied=()=>`${sb()}<div class="body center" style="padding:22px 18px;align-content:start">
+  <div class="bigicon" style="background:#fbe5e3;color:#b3261e">!</div>
+  <b style="font-size:19px">Access denied</b>
+  <span class="mut" style="font-size:13px">2nd floor · Ward A · Bed 01 isn't in your allocation for this shift.</span>
+  <div class="card" style="text-align:left"><span class="lb">You're allotted</span><div class="chips">${ch('3rd floor','g')}${ch('4th floor','g')}</div>
+    <span class="lb" style="margin-top:6px">2nd floor charge nurse</span><div class="row"><span><b>Sr. Meena</b> · ext 2204</span><button class="btn sm gh" onclick="toast('Calling ext 2204…')">Call</button></div></div>
+  <button class="btn" onclick="go('cover')">Request temporary cover</button>
+  <button class="btn gh" onclick="go('scan')">Scan another bed</button>
+  <span class="mut" style="font-size:11px">This attempt was logged (reason: NOT_ALLOCATED).</span>
+</div><div class="toast"></div>`;
+
+SC.cover=()=>`${sb(1)}${ab('Request cover','2F · Ward A · Bed 01')}<div class="body">
+  ${S.cover==='none'?`
+  <div class="fld"><label for="cr">Reason</label><select id="cr"><option>Covering break for 2F nurse</option><option>Emergency response</option><option>Asked by charge nurse</option><option>Other</option></select></div>
+  <span class="lb">Duration</span><div class="seg"><button>30 min</button><button class="on">60 min</button><button>2 h</button><button>Till shift end</button></div>
+  <div class="fld"><label for="cn">Note (optional)</label><textarea id="cn">Sr. Kavya on break, patient asked for help.</textarea></div>
+  <button class="btn" onclick="S.cover='pending';render();toast('Request sent to Sr. Meena')">Send to charge nurse</button>`
+  :S.cover==='pending'?`<div class="warnbox"><b>Waiting for approval</b><br>Sent to Sr. Meena (2F charge nurse) at 07:16. You'll get a notification when she decides.</div>
+  <div class="card" style="background:#f7f8fb"><span class="lb">Demo</span><button class="btn sm gh" onclick="go('approve')">Open as charge nurse →</button></div>`
+  :`<div class="okbox"><b>Cover approved</b> by Sr. Meena. You can open 2F-A01 until 08:16.</div><button class="btn" onclick="toast('2F-A01 · V. Pillai opened (demo)')">Open patient</button>`}
+  <span class="mut">After approval, the server adds a temporary access row. The access check honours it until it expires.</span>
+</div><div class="toast"></div>`;
+
+SC.approve=()=>`${sb(1)}${ab('Cover requests','Sr. Meena · Charge nurse · 2nd floor')}<div class="body">
+  ${S.cover==='pending'?`<div class="card"><div class="row"><b>Priya S → 2F-A01</b>${ch('60 min','a')}</div><span class="mut">Covering break for 2F nurse · "Sr. Kavya on break, patient asked for help." · 07:16</span>
+   <div class="two"><button class="btn gr" onclick="S.cover='approved';toast('Approved. Priya has been notified.');render()">Approve</button><button class="btn gh" onclick="S.cover='none';toast('Declined');render()">Decline</button></div></div>`
+  :`<div class="okbox">No pending requests.${S.cover==='approved'?' Last one approved: Priya → 2F-A01, 60 min.':''}</div>`}
+  <div class="card"><span class="lb">Nurses on 2F now</span><div class="row"><span>Sr. Kavya</span>${ch('Break','a')}</div><div class="row"><span>Sr. Rani</span>${ch('On duty','g')}</div></div>
+  <span class="mut">Charge nurses can view every floor, but writes still need the roster or a cover.</span>
+</div><div class="toast"></div>`;
+
+SC.vacant=()=>`${sb()}<div class="body center" style="padding:24px 18px;align-content:start">
+  <div class="bigicon" style="background:#eceff4;color:#6b7590">○</div>
+  <b style="font-size:18px">3F · Ward B · Bed 09 is vacant</b><span class="mut">Discharged at 05:30 · cleaned at 06:40 · ready for admission</span>
+  <button class="btn gh" onclick="go('scan')">Scan another bed</button></div>`;
+
+SC.moved=()=>`${sb()}<div class="body center" style="padding:24px 18px;align-content:start">
+  <div class="bigicon" style="background:#e3ecfa;color:#2b5fb3">→</div>
+  <b style="font-size:18px">Patient transferred</b><span class="mut">K. Das was moved from 3F-B04 to <b>4F-C08</b> at 05:10. Bed 04 is being cleaned.</span>
+  <div class="okbox">4th floor is in your allocation, so you can open this patient.</div>
+  <button class="btn" onclick="toast('Opening 4F-C08 (demo uses R. Kumar)');S.granted=true;setTimeout(()=>go('hub'),600)">Open K. Das · 4F-C08</button>
+  <button class="btn gh" onclick="go('scan')">Scan another bed</button></div><div class="toast"></div>`;
+
+SC.hub=()=>{const v=lastV();const due=S.meds.filter(m=>m.status==='DUE');const newO=S.orders.filter(o=>o.status==='SENT');
+ return `${sb(1)}${ab('Patient','Opened by scan · access until 14:00')}${pbar()}<div class="body">
+  ${S.granted?'':`<div class="warnbox">You're viewing from the floor list. <b>Scan the bed QR</b> to record vitals or medicines. <button class="btn sm" style="margin-top:6px" onclick="go('scan')">Scan now</button></div>`}
+  ${newO.map(o=>`<div class="card" style="border-color:#d9c6f0"><div class="row"><span class="lb">New doctor order</span>${ch(o.at,'p')}</div><b>${esc(o.text)}</b><span class="mut">${o.by}</span><button class="btn sm" onclick="ackOrder(${o.id})">Acknowledge</button></div>`).join('')}
+  <div class="card"><div class="row"><span class="lb">Due now</span>${due.some(m=>m.overdue)?ch('1 overdue','r'):ch('On time','g')}</div>
+   ${due.map(m=>`<div class="row"><span>${m.name} ${m.route}</span><b class="mono">${m.time}</b></div>`).join('')||'<span class="mut">No medicines due</span>'}
+   <div class="row"><span>Vitals (4-hourly)</span><b class="mono">08:00</b></div></div>
+  <div class="card"><div class="row"><span class="lb">Last vitals · ${v.at} · ${v.by}</span>${v.t>38.5?ch('Fever','r'):''}</div><div class="row mono" style="font-size:12px"><span>BP ${v.bp}</span><span>P ${v.p}</span><span style="color:${v.t>38.5?'#b3261e':'inherit'}">T ${v.t}°</span><span style="color:${v.s<94?'#b3261e':'inherit'}">SpO₂ ${v.s}</span></div></div>
+  <button class="card" style="text-align:left;cursor:pointer;border-left:3px solid #233b77;font:inherit;color:inherit" onclick="go('docsum')"><span class="lb">Doctor summary · Dr. Arjun · 06:40</span><span>Continue IV antibiotics. O₂ to keep SpO₂ &gt; 94%. Repeat CBC today. Notify if T &gt; 38.5 °C or SpO₂ &lt; 94%.</span><span class="mut" style="color:#233b77;font-weight:700">Open full summary ›</span></button>
+  <div class="three">
+   <button class="tile" onclick="needScan('vitals')"><b>Vitals</b><span class="mut">Record</span></button>
+   <button class="tile" onclick="needScan('mar')"><b>Medicines</b><span class="mut">${due.length} due</span></button>
+   <button class="tile" onclick="needScan('io')"><b>I/O</b><span class="mut">${ioTot('in')-ioTot('out')>=0?'+':''}${ioTot('in')-ioTot('out')} mL</span></button>
+   <button class="tile" onclick="needScan('diet')"><b>Nutrition</b><span class="mut">${kcal()} kcal</span></button>
+   <button class="tile" onclick="needScan('notes')"><b>Notes</b><span class="mut">${S.notes.length}</span></button>
+   <button class="tile" onclick="needScan('assess')"><b>Assess</b><span class="mut">Morse ${morseScore()}</span></button>
+   <button class="tile" onclick="go('vtrend')"><b>Trends</b><span class="mut">24 h</span></button>
+   <button class="tile" onclick="go('tasks')"><b>Tasks</b><span class="mut">${S.tasks.filter(t=>t.st==='OPEN').length} open</span></button>
+   <button class="tile" onclick="go('docsum')"><b>Doctor</b><span class="mut">Orders</span></button>
+  </div>
+</div><div class="toast"></div>`};
+function ackOrder(id){const o=S.orders.find(x=>x.id===id);o.status='SEEN';o.who='Priya · '+clock();toast('Acknowledged. Dr. Arjun sees "Seen by Priya".');render()}
+
+SC.docsum=()=>`${sb(1)}${ab('Doctor summary','What the treating doctor wants done')}${pbar()}<div class="body">
+  <div class="card"><span class="lb">Diagnosis</span><b>Community-acquired pneumonia (R lower lobe)</b><span class="mut">Also has type 2 diabetes. Penicillin allergy (rash). Admitted 18 Sep.</span></div>
+  <div class="card" style="border-color:#f1c1bb"><span class="lb">Notify doctor if</span><div class="chips">${ch('Temp > 38.5 °C','r')}${ch('SpO₂ < 94%','r')}${ch('SBP < 90','r')}${ch('GRBS > 300','r')}</div></div>
+  <div class="card" style="border-color:#bcc9ea;background:#f5f7fd"><span class="lb">Reply to your SBAR · Dr. Arjun 07:31</span><span><b>Give paracetamol 650 now, recheck temperature in 1 h, send blood culture ×2.</b></span><span class="mut">Blood culture added as a task. Held-dose decision: agreed, keep SOS.</span></div>
+  <div class="card"><span class="lb">Latest doctor note · 06:40</span><span>Day 3. Still febrile, crackles R base. Continue ceftriaxone (penicillin allergy noted: cephalosporin acceptable, monitor for rash). O₂ 2 L to keep SpO₂ &gt; 94%. Repeat CBC and CRP. Encourage oral fluids.</span></div>
+  <div class="card"><span class="lb">Active medicines (${S.meds.length})</span>${S.meds.map(m=>`<div class="row"><span>${m.name} · ${m.route}</span><span class="mut">${m.freq}</span></div>`).join('')}</div>
+  <div class="card"><span class="lb">Investigations</span><div class="row"><span>CBC, CRP</span>${ch('Sample due 09:00','a')}</div><div class="row"><span>Chest X-ray</span>${ch('Reported','g')}</div><div class="row"><span>Blood culture</span>${ch('Pending 48 h','x')}</div></div>
+  <div class="card"><span class="lb">Nursing orders</span>${S.orders.map(o=>`<div class="row"><span>${esc(o.text)}</span>${o.status==='SENT'?`<button class="btn sm" onclick="ackOrder(${o.id})">Ack</button>`:ch(o.status==='DONE'?'Done':'Seen','g')}</div>`).join('')}<div class="row"><span>Vitals every 4 hours</span>${ch('Active','g')}</div><div class="row"><span>Strict I/O chart</span>${ch('Active','g')}</div></div>
+  <div class="card"><span class="lb">Diet order</span><span>Soft diabetic diet · 1,800 kcal · no added salt · encourage 2 L fluids</span></div>
+</div><div class="toast"></div>`;
+
+SC.vitals=()=>{const v=lastV();return `${sb(1)}${ab('Record vitals','R. Kumar · 3F-B07 · '+clock())}<div class="body">
+  <span class="mut">Last: ${v.at} · BP ${v.bp} · T ${v.t}° · SpO₂ ${v.s}%</span>
+  <div class="two">
+   <div class="fld"><label for="v_sys">Systolic</label><input id="v_sys" inputmode="numeric" value="128" oninput="checkV()"></div>
+   <div class="fld"><label for="v_dia">Diastolic</label><input id="v_dia" inputmode="numeric" value="80" oninput="checkV()"></div>
+   <div class="fld"><label for="v_p">Pulse /min</label><input id="v_p" inputmode="numeric" value="94" oninput="checkV()"></div>
+   <div class="fld"><label for="v_t">Temp °C</label><input id="v_t" inputmode="decimal" value="38.6" oninput="checkV()"></div>
+   <div class="fld"><label for="v_s">SpO₂ %</label><input id="v_s" inputmode="numeric" value="95" oninput="checkV()"></div>
+   <div class="fld"><label for="v_rr">Resp /min</label><input id="v_rr" inputmode="numeric" value="20" oninput="checkV()"></div>
+   <div class="fld"><label for="v_g">GRBS mg/dL</label><input id="v_g" inputmode="numeric" value="142" oninput="checkV()"></div>
+   <div class="fld"><label for="v_pain">Pain 0–10</label><input id="v_pain" inputmode="numeric" value="3" oninput="checkV()"></div>
+  </div>
+  <div class="fld"><label for="v_o2">Oxygen</label><select id="v_o2"><option>Room air</option><option selected>2 L/min nasal prongs</option><option>5 L/min face mask</option></select></div>
+  <div id="vAlert"></div>
+  <button class="btn" onclick="saveV()">Save vitals</button>
+</div><div class="toast"></div>`};
+const LIM={v_sys:[90,160,'Systolic BP'],v_dia:[50,100,'Diastolic BP'],v_p:[50,110,'Pulse'],v_t:[35,38.5,'Temperature'],v_s:[94,100,'SpO₂'],v_rr:[10,24,'Resp rate'],v_g:[70,300,'GRBS'],v_pain:[0,6,'Pain']};
+function checkV(){const out=[];Object.keys(LIM).forEach(id=>{const el=document.getElementById(id);if(!el)return;const n=parseFloat(el.value);const[lo,hi,l]=LIM[id];const bad=!isNaN(n)&&(n<lo||n>hi);el.classList.toggle('hi',bad);if(bad)out.push(`${l} ${n} is outside ${lo}–${hi}`)});
+ const box=$('#vAlert');if(box)box.innerHTML=out.length?`<div class="alertbox"><b>${out.length} value${out.length>1?'s':''} outside the doctor's limits</b>${out.map(x=>`<span>• ${x}</span>`).join('')}<span>Dr. Arjun will get a push alert when you save.</span></div>`:'<div class="okbox">All values are within the doctor\'s limits.</div>';return out}
+function saveV(){const g=id=>document.getElementById(id).value;const out=checkV();S.vitals.push({at:clock(),t:parseFloat(g('v_t')),s:parseInt(g('v_s')),p:parseInt(g('v_p')),bp:g('v_sys')+'/'+g('v_dia'),rr:parseInt(g('v_rr')),by:'Priya'});
+ const tk=S.tasks.find(t=>t.id===4);if(tk)tk.st='DONE';toast(out.length?'Saved. Doctor alerted, and the vitals task was auto-completed.':'Saved. Visible to Dr. Arjun now.');setTimeout(()=>{S.stack.pop();go('hub',false)},1100)}
+
+SC.vtrend=()=>{const vs=S.vitals;const W=300,H=110,pad=24;const tMin=36,tMax=40;const x=i=>pad+(vs.length===1?0:i*(W-2*pad)/(vs.length-1));const y=t=>H-12-(t-tMin)*(H-24)/(tMax-tMin);
+ const pts=vs.map((v,i)=>`${x(i)},${y(v.t)}`).join(' ');
+ return `${sb(1)}${ab('Vitals trend','Last 24 hours')}<div class="body">
+  <div class="card"><span class="lb">Temperature °C</span>
+   <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Temperature trend">
+    <line x1="${pad}" x2="${W-pad}" y1="${y(38.5)}" y2="${y(38.5)}" stroke="#b3261e" stroke-dasharray="4 3" stroke-width="1"/><text x="${W-pad}" y="${y(38.5)-4}" font-size="9" text-anchor="end" fill="#b3261e">notify &gt; 38.5</text>
+    <line x1="${pad}" x2="${W-pad}" y1="${y(37)}" y2="${y(37)}" stroke="#e0e5ee"/><text x="2" y="${y(37)+3}" font-size="9" fill="#6b7590">37</text><text x="2" y="${y(39)+3}" font-size="9" fill="#6b7590">39</text>
+    <polyline points="${pts}" fill="none" stroke="#233b77" stroke-width="2"/>
+    ${vs.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v.t)}" r="3.5" fill="${v.t>38.5?'#b3261e':'#233b77'}"/><text x="${x(i)}" y="${H-1}" font-size="9" text-anchor="middle" fill="#6b7590">${v.at}</text>`).join('')}
+   </svg></div>
+  <div class="card"><span class="lb">All readings</span><div class="tl">${vs.slice().reverse().map(v=>`<div class="it"><span class="tm">${v.at}</span><div><div class="mono" style="font-size:12px">BP ${v.bp} · P ${v.p} · T <b style="color:${v.t>38.5?'#b3261e':'inherit'}">${v.t}</b> · SpO₂ ${v.s} · RR ${v.rr}</div><span class="mut">${v.by}</span></div></div>`).join('')}</div></div>
+</div>`};
+
+SC.mar=()=>{const list=S.marFilter==='due'?S.meds.filter(m=>m.status==='DUE'):S.meds;
+ return `${sb(1)}${ab('Medicines','R. Kumar · 3F-B07 · 08:00 round')}<div class="body">
+  <div class="seg"><button class="${S.marFilter==='due'?'on':''}" onclick="S.marFilter='due';render()">Due now (${marCount('DUE')})</button><button class="${S.marFilter==='all'?'on':''}" onclick="S.marFilter='all';render()">Today (${S.meds.length})</button></div>
+  ${list.map(m=>`<div class="card"><div class="row"><b>${m.name}</b>${m.status==='DUE'?ch((m.overdue?'Overdue ':'Due ')+m.time,m.overdue?'r':'a'):m.status==='GIVEN'?ch('Given '+m.at,'g'):m.status==='HELD'||m.status==='REFUSED'?ch(m.status.toLowerCase()+' '+(m.at||''),'r'):ch(m.time,'x')}</div>
+   <span class="mut">${m.route} · ${m.freq} · dispensed by pharmacy ✓</span>
+   ${m.status==='GIVEN'?`<span class="mut">by ${m.by}</span>`:''}${m.reason?`<span class="mut" style="color:#b3261e">Reason: ${m.reason}</span>`:''}
+   ${m.status==='DUE'?`<button class="btn" onclick="S.sel=${m.id};S.holdMode=false;go('admin')">Administer</button>`:''}</div>`).join('')||'<div class="okbox">Nothing due right now.</div>'}
+  <span class="mut">Only doses that pharmacy has dispensed appear here. Doses come from the doctor's prescription.</span>
+</div><div class="toast"></div>`};
+
+SC.admin=()=>{const m=S.meds.find(x=>x.id===S.sel)||S.meds[0];return `${sb(1)}${ab('Administer',m.name)}<div class="body">
+  <div class="card"><span class="lb">Five rights check</span>
+   <div class="row"><span>Right patient: bed scanned (3F-B07)</span>${S.granted?ch('✓','g'):ch('scan','r')}</div>
+   <div class="row"><span>Right drug and dose: ${m.name}</span>${ch('✓','g')}</div>
+   <div class="row"><span>Right route: ${m.route}</span>${ch('✓','g')}</div>
+   <div class="row"><span>Right time: ${m.time}</span>${m.overdue?ch('late 3 min','a'):ch('✓','g')}</div>
+   <div class="row"><span>Allergy check</span>${m.warn?ch('caution','a'):ch('clear','g')}</div></div>
+  ${m.warn?`<div class="warnbox">${m.warn}</div>`:''}
+  ${m.id===2?`<div class="warnbox">This is an SOS medicine: give only if temperature is above 38.5 °C. Last recorded: <b>${lastV().t} °C</b>.</div>`:''}
+  ${S.holdMode?`
+   <div class="fld"><label for="hs">Status</label><select id="hs"><option>HELD</option><option>REFUSED</option><option>NPO</option><option>DELAYED</option></select></div>
+   <div class="fld"><label for="hr">Reason (required)</label><select id="hr"><option>Patient refused</option><option>Vomiting</option><option>BP too low</option><option>Not indicated (SOS criteria not met)</option><option>Medicine not available</option></select></div>
+   <button class="btn rd" onclick="holdMed(${m.id})">Save as not given</button><button class="btn gh" onclick="S.holdMode=false;render()">Cancel</button>`
+  :`<div class="two"><div class="fld"><label for="site">Site</label><select id="site"><option>${m.route==='IV'?'IV cannula L forearm':m.route==='SC'?'Abdomen':'Oral'}</option><option>Other</option></select></div><div class="fld"><label for="batch">Batch</label><input id="batch" value="${m.route==='IV'?'CFX2231':'PCM0917'}"></div></div>
+   <button class="btn gr" onclick="giveMed(${m.id})" ${S.granted?'':'disabled'}>Confirm given</button>
+   <button class="btn gh" onclick="S.holdMode=true;render()">Not given (hold / refused)</button>`}
+  <span class="mut">Saves through the nurse console with your ID from the login token. The dose appears on the doctor's Nursing tab straight away.</span>
+</div><div class="toast"></div>`};
+function giveMed(id){const m=S.meds.find(x=>x.id===id);m.status='GIVEN';m.by='Priya';m.at=clock();m.overdue=false;toast('Recorded as given at '+m.at);setTimeout(()=>{S.stack.pop();go('mar',false)},900)}
+function holdMed(id){const m=S.meds.find(x=>x.id===id);m.status=$('#hs').value;m.reason=$('#hr').value;m.at=clock();m.overdue=false;S.holdMode=false;toast('Saved as '+m.status.toLowerCase()+'. Dr. Arjun has been alerted.');setTimeout(()=>{S.stack.pop();go('mar',false)},1100)}
+
+SC.io=()=>{const bal=ioTot('in')-ioTot('out');return `${sb(1)}${ab('Intake / output','Strict I/O · since 00:00')}<div class="body">
+  <div class="three"><div class="card"><span class="lb">In</span><b class="mono">${ioTot('in')}</b></div><div class="card"><span class="lb">Out</span><b class="mono">${ioTot('out')}</b></div><div class="card"><span class="lb">Balance</span><b class="mono" style="color:${bal<0?'#b3261e':'#17804f'}">${bal>=0?'+':''}${bal}</b></div></div>
+  <div class="card"><span class="lb">Add entry</span>
+   <div class="seg"><button class="${S.ioKind==='in'?'on':''}" onclick="S.ioKind='in';render()">Intake</button><button class="${S.ioKind==='out'?'on':''}" onclick="S.ioKind='out';render()">Output</button></div>
+   <div class="two"><div class="fld"><label for="iot">Type</label><select id="iot">${(S.ioKind==='in'?['Oral','IV fluid · NS','IV fluid · DNS','RT feed','Blood product']:['Urine','Drain','Vomit','RT aspirate','Stool']).map(o=>`<option>${o}</option>`).join('')}</select></div>
+   <div class="fld"><label for="iom">Amount mL</label><input id="iom" inputmode="numeric" value="${S.ioKind==='in'?200:300}"></div></div>
+   <button class="btn" onclick="S.io.push({k:S.ioKind,type:$('#iot').value,ml:parseInt($('#iom').value)||0,at:clock()});toast('Added to I/O chart');render()">Add</button></div>
+  <div class="card"><span class="lb">Today</span><div class="tl">${S.io.slice().reverse().map(e=>`<div class="it"><span class="tm">${e.at}</span><div class="row"><span>${e.type}</span><b class="mono" style="color:${e.k==='in'?'#17804f':'#9a6200'}">${e.k==='in'?'+':'−'}${e.ml}</b></div></div>`).join('')}</div></div>
+</div><div class="toast"></div>`};
+
+SC.diet=()=>{const k=kcal();return `${sb(1)}${ab('Nutrition','Soft diabetic · 1,800 kcal target')}<div class="body">
+  <div class="card"><div class="row"><span class="lb">Eaten today</span><b class="mono">${k.toLocaleString()} / 1,800 kcal</b></div><div class="bar"><i style="width:${Math.min(100,k/18)}%"></i></div><span class="mut">Protein about ${Math.round(k*0.045)} g of 70 g · Fluids 1,450 mL of 2 L</span></div>
+  <div class="card"><span class="lb">Diet order (from IP Diet V2)</span><span>Soft diabetic · no added salt · 4 meals · allergy: penicillin (not food)</span><span class="mut">Ordered by Dr. Arjun · kitchen: MOP F&amp;B</span></div>
+  ${S.meals.map((m,i)=>`<div class="card"><div class="row"><b>${m.slot} · ${m.time}</b>${m.status==='Delivered'?ch('Delivered','g'):ch('Scheduled','x')}</div><span class="mut">about ${m.kcal} kcal</span>
+   ${m.status==='Delivered'?`<span class="lb">How much was eaten?</span><div class="seg">${[0,25,50,75,100].map(p=>`<button class="${m.pct===p?'on':''}" onclick="S.meals[${i}].pct=${p};render()">${p===0?'None':p===100?'All':p+'%'}</button>`).join('')}</div>`:''}</div>`).join('')}
+  <button class="btn" onclick="toast('Consumption saved to MOP and mirrored to HMS. The doctor can see it.')">Save consumption</button>
+  <span class="mut">If a meal is refused twice in a row, the doctor and dietitian are alerted.</span>
+</div><div class="toast"></div>`};
+
+SC.notes=()=>`${sb(1)}${ab('Nursing notes','R. Kumar · 3F-B07')}<div class="body">
+  <div class="seg">${['General','SBAR','Incident','Procedure'].map(c=>`<button class="${S.noteCat===c?'on':''}" onclick="S.noteCat='${c}';render()">${c}</button>`).join('')}</div>
+  ${S.noteCat==='SBAR'?`<div class="fld"><label for="n1">Situation</label><textarea id="n1" style="min-height:44px">Fever 38.6 °C at 07:24</textarea></div><div class="fld"><label for="n2">Assessment</label><textarea id="n2" style="min-height:44px">SpO₂ 95% on 2 L, chest crackles</textarea></div><div class="fld"><label for="n3">Recommendation</label><textarea id="n3" style="min-height:44px">Doctor review requested</textarea></div>`
+  :`<div class="fld"><label for="nt">Note</label><textarea id="nt">Patient comfortable. Mild cough. Ambulated to washroom with support. Oral intake improving.</textarea></div>`}
+  <button class="btn" onclick="S.notes.unshift({cat:S.noteCat,at:clock(),by:'Priya',text:S.noteCat==='SBAR'?'S: '+$('#n1').value+' · A: '+$('#n2').value+' · R: '+$('#n3').value:$('#nt').value});toast('Note saved. Shown on the doctor timeline.');render()">Save note</button>
+  <div class="card"><span class="lb">Recent</span><div class="tl">${S.notes.map(n=>`<div class="it"><span class="tm">${n.at}</span><div><div class="row"><b style="font-size:12px">${n.by}</b>${ch(n.cat,n.cat==='SBAR'?'p':n.cat==='Incident'?'r':'')}</div><span class="mut">${esc(n.text)}</span></div></div>`).join('')}</div></div>
+</div><div class="toast"></div>`;
+
+const MORSE=[['History of falling',[['No',0],['Yes',25]]],['Secondary diagnosis',[['No',0],['Yes',15]]],['Ambulatory aid',[['None/bed rest',0],['Crutch/walker',15],['Furniture',30]]],['IV / heparin lock',[['No',0],['Yes',20]]],['Gait',[['Normal',0],['Weak',10],['Impaired',20]]],['Mental status',[['Oriented',0],['Forgets limits',15]]]];
+SC.assess=()=>{const sc=morseScore();const risk=sc>=45?['High risk','r']:sc>=25?['Moderate','a']:['Low','g'];return `${sb(1)}${ab('Assessments','Morse fall scale')}<div class="body">
+  <div class="chips">${ch('Morse · due now','a')}${ch('Braden 14 · done 22:10','g')}${ch('Pain · every 4 h','x')}${ch('Nutrition screen · done','g')}</div>
+  ${MORSE.map((q,i)=>`<div class="card"><span class="lb">${q[0]}</span><div class="seg">${q[1].map(o=>`<button class="${S.morse[i]===o[1]?'on':''}" onclick="S.morse[${i}]=${o[1]};render()">${o[0]} · ${o[1]}</button>`).join('')}</div></div>`).join('')}
+  <div class="card"><div class="row"><b style="font-size:16px">Score ${sc}</b>${ch(risk[0],risk[1])}</div><span class="mut">${sc>=45?'Starts the fall-prevention bundle: bed low, rails up, call bell in reach, reassess every shift.':'Reassess every 24 hours.'}</span></div>
+  <button class="btn" onclick="toast('Assessment saved. Next due at the start of the evening shift.')">Save assessment</button>
+</div><div class="toast"></div>`};
+
+SC.tasks=()=>`${sb(1)}${ab('My tasks','3F + 4F · Morning',true)}<div class="body">
+  <div class="chips">${ch('Open '+S.tasks.filter(t=>t.st==='OPEN').length,'a')}${ch('Done '+S.tasks.filter(t=>t.st==='DONE').length,'g')}${ch('Overdue 1','r')}</div>
+  ${S.tasks.map(t=>`<div class="card"><div class="row"><b>${t.t}</b>${t.st==='DONE'?ch('Done','g'):ch(t.due,t.due==='08:00'?'r':'a')}</div><span class="mut">R. Kumar · 3F-B07 · ${t.src}</span>
+   ${t.st==='OPEN'?`<div class="two"><button class="btn sm" style="width:100%" onclick="doneTask(${t.id})">${t.t.startsWith('Vitals')?'Record vitals':'Complete'}</button><button class="btn sm gh" style="width:100%" onclick="toast('Deferred by 30 min (reason required)')">Defer</button></div>`:''}</div>`).join('')}
+</div>${nav('tasks')}<div class="toast"></div>`;
+function doneTask(id){const t=S.tasks.find(x=>x.id===id);if(t.t.startsWith('Vitals')){needScan('vitals');return}if(t.t.startsWith('Collect')){toast('Scan sample barcode… CBC-55120-01 linked');}t.st='DONE';if(t.id===2){const o=S.orders.find(x=>x.id===1);if(o)o.status='DONE'}setTimeout(render,t.t.startsWith('Collect')?900:0);if(!t.t.startsWith('Collect'))toast('Task completed')}
+
+SC.alerts=()=>`${sb(1)}${ab('Alerts','Orders, covers, overdue',true)}<div class="body">
+  ${S.orders.filter(o=>o.status==='SENT').map(o=>`<div class="card" style="border-color:#d9c6f0"><div class="row">${ch('New order','p')}<span class="mut">${o.at}</span></div><b>${esc(o.text)}</b><span class="mut">${o.by} · R. Kumar 3F-B07</span><button class="btn sm" onclick="ackOrder(${o.id})">Acknowledge</button></div>`).join('')}
+  ${S.cover==='approved'?`<div class="card">${ch('Cover approved','g')}<b>2F-A01 opened for 60 min</b><span class="mut">by Sr. Meena</span></div>`:''}
+  <div class="card"><div class="row">${ch('Overdue','r')}<span class="mut">08:00</span></div><b>Inj. Ceftriaxone 1 g · R. Kumar</b><span class="mut">The charge nurse is notified if it's 30 minutes late.</span></div>
+  <div class="card"><div class="row">${ch('Lab','x')}<span class="mut">07:50</span></div><b>CBC sample collection due at 09:00</b><span class="mut">3F-B07 · auto-created from the lab order</span></div>
+</div>${nav('alerts')}<div class="toast"></div>`;
+
+SC.handover=()=>`${sb(1)}${ab('Shift handover','Priya → Sr. Kavya (Evening) · 3F + 4F')}<div class="body">
+  ${S.handoverSent?`<div class="okbox"><b>Sent at 13:42.</b> Waiting for Sr. Kavya to acknowledge. You'll be notified.</div>`:'<span class="mut">Filled in automatically from today\'s charting. Edit the recommendation before sending.</span>'}
+  <div class="card"><div class="row"><b>3F-B07 · R. Kumar</b>${ch('Flagged','r')}</div>
+   <div class="mut"><b>S</b> Day 3 pneumonia. Fever peaked at ${Math.max(...S.vitals.map(v=>v.t))} °C.</div>
+   <div class="mut"><b>B</b> Penicillin allergy, DM2 on insulin.</div>
+   <div class="mut"><b>A</b> Last SpO₂ ${lastV().s}% on 2 L. Medicines given ${marCount('GIVEN')}, held ${S.meds.filter(m=>m.status==='HELD'||m.status==='REFUSED').length}. Ate ${kcal()} kcal. I/O ${ioTot('in')-ioTot('out')>=0?'+':''}${ioTot('in')-ioTot('out')} mL.</div>
+   <div class="fld"><label for="hrec">Recommendation</label><textarea id="hrec" style="min-height:50px" ${S.handoverSent?'disabled':''}>Recheck temp at 16:00. Follow up CBC result. Nebulize at 16:00.</textarea></div></div>
+  <div class="card"><div class="row"><b>3F-B08 · S. Devi</b>${ch('Watch','a')}</div><div class="mut"><b>A</b> Pain 3, drain 40 mL. Tolerated soft lunch. <b>R</b> Mobilize in the evening.</div></div>
+  <span class="mut">+ 26 stable patients included automatically</span>
+  ${S.handoverSent?'':`<button class="btn" onclick="S.handoverSent=true;toast('Handover sent to Sr. Kavya');render()">Send to incoming nurse</button>`}
+</div><div class="toast"></div>`;
+
+SC.profile=()=>`${sb(1)}${ab('My profile','',true)}<div class="body">
+  <div class="card"><b style="font-size:16px">Priya S</b><span class="mut">Staff Nurse · ID 412 · Medicine unit</span></div>
+  <div class="card"><span class="lb">Today</span><span>Morning 06:00–14:00 · 3F Ward B, 4F Ward C</span><span class="mut">Access grants expire at shift end.</span></div>
+  <div class="card"><span class="lb">This shift</span><div class="row"><span>Beds scanned</span><b>14</b></div><div class="row"><span>Medicines given</span><b>${marCount('GIVEN')+20}</b></div><div class="row"><span>Vitals recorded</span><b>${S.vitals.length+9}</b></div><div class="row"><span>Denied scans</span><b>1</b></div></div>
+  <button class="btn gh" onclick="go('handover')">Handover</button>
+  <button class="btn rd" onclick="S=fresh();render();">Sign out</button>
+</div>`;
+
+SC.opq=()=>{const st={WAITING:['Waiting','a'],VITALS_IN_PROGRESS:['Vitals…','p'],VITALS_DONE:['Vitals done','g'],WITH_DOCTOR:['With doctor','x']};return `${sb(1)}${ab('OP triage queue','OPD Block A · Medicine')}<div class="body">
+  <div class="seg"><button class="on">Dr. Arjun · ${S.opq.length}</button><button>Dr. Kavitha · 6</button><button>Dr. Rahul · 3</button></div>
+  ${S.opq.map(p=>`<div class="card"><div class="row"><b><span class="mono">${p.tok}</span> · ${p.name}</b>${ch(st[p.st][0],st[p.st][1])}</div><span class="mut">Checked in at reception · auto-added to queue</span>
+   ${p.st==='WAITING'?`<button class="btn sm" onclick="S.opSel='${p.tok}';S.opq.find(x=>x.tok==='${p.tok}').st='VITALS_IN_PROGRESS';go('opv')">Start vitals</button>`:''}
+   ${p.st==='VITALS_DONE'?`<button class="btn sm gh" onclick="S.opq.find(x=>x.tok==='${p.tok}').st='WITH_DOCTOR';toast('Sent to Dr. Arjun');render()">Send to doctor</button>`:''}</div>`).join('')}
+</div><div class="toast"></div>`};
+
+SC.opv=()=>{const p=S.opq.find(x=>x.tok===S.opSel)||S.opq[0];return `${sb(1)}${ab('OP triage',p.tok+' · '+p.name)}<div class="body">
+  <div class="two">
+   <div class="fld"><label for="o1">BP</label><input id="o1" value="138/88"></div><div class="fld"><label for="o2">Pulse</label><input id="o2" value="84"></div>
+   <div class="fld"><label for="o3">Temp °C</label><input id="o3" value="37.0"></div><div class="fld"><label for="o4">SpO₂ %</label><input id="o4" value="98"></div>
+   <div class="fld"><label for="o5">Weight kg</label><input id="o5" value="72"></div><div class="fld"><label for="o6">Height cm</label><input id="o6" value="170"></div>
+   <div class="fld"><label for="o7">Blood sugar</label><input id="o7" value="156"></div><div class="fld"><label for="o8">Sugar type</label><select id="o8"><option>RBS</option><option>FBS</option><option>PPBS</option></select></div>
+  </div>
+  <div class="fld"><label for="o9">Allergies</label><input id="o9" value="Sulfa drugs" style="font-family:var(--sans)"></div>
+  <span class="lb">Pain · fall risk</span><div class="seg"><button class="on">Pain 2</button><button>Fall risk: low</button><button>Nutrition: OK</button></div>
+  <button class="btn" onclick="(S.opq.find(x=>x.tok==='${p.tok}')||{}).st='VITALS_DONE';toast('Saved to the visit vitals. Dr. Arjun sees \\'Vitals ready\\'.');setTimeout(()=>{S.stack.pop();go('opq',false)},1000)">Save &amp; mark vitals done</button>
+  <span class="mut">Saved to the same visit record the doctor's case sheet reads, including allergies.</span>
+</div><div class="toast"></div>`};
+
+/* ---- doctor side ---- */
+SC.dlist=()=>{const held=S.meds.filter(m=>m.status==='HELD'||m.status==='REFUSED').length;const fever=lastV().t>38.5;return `${sb(1)}${ab('My IP patients','Dr. Arjun · 11 admitted',true)}<div class="body">
+  <div class="chips">${ch('All 11')}${ch('Nursing flags 3','r')}${ch('Orders unseen '+S.orders.filter(o=>o.status==='SENT').length,'p')}</div>
+  <button class="bed" onclick="go('dnurse')"><div class="row"><b>3F-B07 · R. Kumar · 62 M</b></div><span class="mut">Pneumonia · Day 3</span><div class="chips">${fever?ch('Fever '+lastV().t+'°','r'):ch('Afebrile','g')}${held?ch(held+' dose held','r'):ch('MAR on track','g')}${ch('Ate '+kcal()+' kcal','a')}${S.orders.some(o=>o.status==='SENT')?ch('Order unseen','p'):ch('Orders seen','g')}</div></button>
+  <button class="bed" onclick="toast('Demo: open R. Kumar')"><div class="row"><b>3F-B08 · S. Devi · 45 F</b></div><span class="mut">Post-op lap chole · Day 1</span><div class="chips">${ch('Vitals normal','g')}${ch('Pain 3','x')}</div></button>
+  <button class="bed" onclick="toast('Demo: open R. Kumar')"><div class="row"><b>4F-C03 · M. Iqbal · 71 M</b></div><span class="mut">CHF · Day 5</span><div class="chips">${ch('Balance −600 mL','a')}${ch('Weight −0.8 kg','g')}</div></button>
+</div>${dnav('dlist')}<div class="toast"></div>`};
+
+SC.dnurse=()=>{const v=lastV();const bal=ioTot('in')-ioTot('out');return `${sb(1)}${ab('R. Kumar · 3F-B07','IP day 3 · Nursing tab')}<div class="body">
+  <div class="seg"><button class="on">Today</button><button onclick="go('dhist')">History</button><button onclick="go('dmarh')">MAR</button><button onclick="go('dprev')">Past stays</button></div>
+  <div class="card"><div class="row"><span class="lb">Vitals · last ${v.at} by ${v.by}</span>${v.t>38.5?ch('Above threshold','r'):ch('Normal','g')}</div><div class="mono" style="font-size:12px">BP ${v.bp} · P ${v.p} · T ${v.t}° · SpO₂ ${v.s}%</div><span class="mut">Temperature trend: ${S.vitals.map(x=>x.t).join(' → ')}</span></div>
+  <div class="card"><span class="lb">Medicines today</span><div class="row"><span>Given <b>${marCount('GIVEN')}</b></span><span>Due <b>${marCount('DUE')}</b></span><span style="color:#b3261e">Held/refused <b>${S.meds.filter(m=>m.status==='HELD'||m.status==='REFUSED').length}</b></span></div>
+   ${S.meds.filter(m=>m.status!=='SCHEDULED').map(m=>`<div class="row"><span class="mut">${m.name}</span>${m.status==='GIVEN'?ch(m.at+' '+m.by,'g'):m.status==='DUE'?ch('due '+m.time,'a'):ch(m.status.toLowerCase()+(m.reason?' · '+m.reason:''),'r')}</div>`).join('')}</div>
+  <div class="card"><span class="lb">Nutrition · I/O</span><div class="row"><span>Eaten ${kcal()} / 1,800 kcal</span><span class="mono" style="color:${bal<0?'#b3261e':'#17804f'}">I/O ${bal>=0?'+':''}${bal} mL</span></div><div class="bar"><i style="width:${Math.min(100,kcal()/18)}%"></i></div></div>
+  <div class="card"><span class="lb">Latest nursing note · ${S.notes[0].by} ${S.notes[0].at}</span><span>${esc(S.notes[0].text)}</span></div>
+  <div class="card"><span class="lb">Orders</span>${S.orders.map(o=>`<div class="row"><span>${esc(o.text)}</span>${o.status==='SENT'?ch('Sent · unseen','p'):o.status==='SEEN'?ch('Seen · '+o.who,'g'):ch('Done','g')}</div>`).join('')}</div>
+  <div class="card"><span class="lb">Assessments · handover</span><div class="row"><span>Morse fall ${morseScore()}</span><span>Braden 14</span></div><span class="mut">Last handover: Sr. Anu → Priya, 06:08 (acknowledged)</span></div>
+  <div class="two"><button class="btn gh" onclick="go('dhist')">Nursing history ›</button><button class="btn" onclick="go('dorder')">＋ New order</button></div>
+</div>${dnav('dlist')}<div class="toast"></div>`};
+
+SC.dorder=()=>`${sb(1)}${ab('Nursing orders','R. Kumar · 3F-B07')}<div class="body">
+  <span class="lb">Order type</span><div class="seg"><button class="on">Nursing</button><button>Vitals freq</button><button>Notify if</button><button>Diet</button></div>
+  <div class="fld"><label for="ot">Order</label><input id="ot" value="Chest physiotherapy twice daily" style="font-family:var(--sans)"></div>
+  <div class="two"><div class="fld"><label for="of">Frequency</label><select id="of"><option>BD</option><option>Q6H</option><option>Once</option><option>SOS</option></select></div><div class="fld"><label for="op">Priority</label><select id="op"><option>Routine</option><option>Urgent</option></select></div></div>
+  <button class="btn" onclick="S.orders.push({id:Date.now(),text:$('#ot').value+' · '+$('#of').value,by:'Dr. Arjun',at:clock(),status:'SENT',who:''});toast('Sent. Nurses on 3F have been notified.');render()">Send to nursing</button>
+  <div class="card"><span class="lb">Order status</span>${S.orders.map(o=>`<div class="row"><span>${esc(o.text)}</span>${o.status==='SENT'?ch('Sent','p'):o.status==='SEEN'?ch('Seen · '+o.who,'g'):ch('Done','g')}</div>`).join('')}</div>
+  <div class="card" style="background:#f7f8fb"><span class="lb">Demo</span><span class="mut">Switch to the nurse, acknowledge the order, then come back here to see its status change.</span><button class="btn sm gh" onclick="go('hub')">Open nurse view →</button></div>
+</div>${dnav('dorder')}<div class="toast"></div>`;
+
+SC.dalert=()=>`${sb(1)}${ab('Alerts','Dr. Arjun',true)}<div class="body">
+  <div class="card" style="border-color:#f1c1bb"><div class="row">${ch('Critical vitals','r')}<span class="mut">07:24</span></div><b>R. Kumar · 3F-B07: temperature ${Math.max(...S.vitals.map(v=>v.t))} °C</b><span class="mut">Recorded by Priya. Your limit: notify if above 38.5 °C.</span>
+   ${S.docAck?ch('Acknowledged','g'):`<div class="two"><button class="btn sm" style="width:100%" onclick="go('dnurse')">Open patient</button><button class="btn sm gh" style="width:100%" onclick="S.docAck=true;toast('Acknowledged. The nurse sees that you reviewed it.');render()">Acknowledge</button></div>`}</div>
+  ${S.meds.filter(m=>m.status==='HELD'||m.status==='REFUSED').map(m=>`<div class="card"><div class="row">${ch('Dose '+m.status.toLowerCase(),'a')}<span class="mut">${m.at}</span></div><b>${m.name} · R. Kumar</b><span class="mut">Reason: ${m.reason} · Priya</span></div>`).join('')}
+  <div class="card"><div class="row">${ch('Meal refused','a')}<span class="mut">yesterday 19:40</span></div><b>M. Iqbal · 4F-C03 ate 0% of dinner</b><span class="mut">Dietitian notified</span></div>
+</div>${dnav('dalert')}<div class="toast"></div>`;
+
+/* ---- doctor side: OP ---- */
+SC.d_opq=()=>`${sb(1)}${ab('OP queue','Dr. Arjun · today',true)}<div class="body">
+  <div class="chips">${ch('5 in queue')}${ch('1 vitals ready','g')}${ch('2 waiting for nurse','x')}</div>
+  ${[['T-10','K. Rao · 41 M','Follow-up HTN','With you','',''],['T-11','L. Mary · 58 F','Knee pain, high sugar','Vitals ready','g','Priya 09:38'],['T-12','A. Joseph · 34 M','Fever 3 days','Nurse: vitals in progress','p',''],['T-13','P. Lakshmi · 29 F','Antenatal','Waiting for nurse','x','']]
+   .map(p=>`<button class="bed" onclick="${p[0]==='T-11'?"go('d_opcase')":"toast('Demo: open T-11 L. Mary')"}"><div class="row"><b><span class="mono">${p[0]}</span> · ${p[1]}</b>${ch(p[3],p[4])}</div><span class="mut">${p[2]}${p[5]?' · vitals by '+p[5]:''}</span>${p[0]==='T-11'?`<div class="chips">${ch('BP 148/92','r')}${ch('RBS 212','r')}${ch('Allergy: Sulfa','r')}</div>`:''}</button>`).join('')}
+</div>${dnav('d_opq')}<div class="toast"></div>`;
+
+SC.d_opcase=()=>`${sb(1)}${ab('L. Mary · 58 F','T-11 · UHID 198220 · arrived 09:20')}<div class="body">
+  <div class="alertbox"><b>Allergy recorded by nurse: Sulfa drugs (rash)</b></div>
+  <div class="card"><div class="row"><span class="lb">Nurse triage · Priya 09:38</span>${S.opRev?ch('Reviewed','g'):`<button class="btn sm" onclick="S.opRev=true;toast('Marked reviewed');render()">Mark reviewed</button>`}</div>
+   <div class="three"><div><span class="lb">BP</span><div class="mono" style="color:#b3261e;font-weight:700">148/92</div></div><div><span class="lb">Pulse</span><div class="mono">88</div></div><div><span class="lb">Temp</span><div class="mono">36.8°</div></div>
+   <div><span class="lb">SpO₂</span><div class="mono">97%</div></div><div><span class="lb">RBS</span><div class="mono" style="color:#b3261e;font-weight:700">212</div></div><div><span class="lb">BMI</span><div class="mono">25.6</div></div></div>
+   <span class="mut">Pain 4 (R knee) · fall risk low · appetite reduced · lives alone · Tamil, needs help</span>
+   <span class="mut">Last visit 14 Aug: BP 142/90 · RBS 188</span></div>
+  <div class="card"><span class="lb">Send to OP nurse</span><div class="chips">${ch('Inj. Diclofenac 75 mg IM','p')}${ch('Knee hot pack 15 min','p')}</div>
+   ${S.opProc?`<div class="row"><span>Diclofenac IM</span>${ch('Given · Priya 10:02','g')}</div><div class="row"><span>Hot pack</span>${ch('In progress','a')}</div>`
+   :`<button class="btn" onclick="S.opProc=true;toast('Sent to OP nurse. You\\'ll see when it\\'s done.');render()">Send procedures</button>`}</div>
+</div>${dnav('d_opq')}<div class="toast"></div>`;
+
+/* ---- doctor side: IP history ---- */
+const HDAYS=[{d:3,date:'21 Sep · today',t:'37.9–38.6',s:93,mar:'5/8 · 1 held',mk:'r',io:'+350',kc:1150,n:2,hand:'Anu → Priya ✓'},{d:2,date:'20 Sep',t:'37.4–38.4',s:92,mar:'10/10',mk:'g',io:'+420',kc:1050,n:3,hand:'Meena → Kavya → Anu'},{d:1,date:'19 Sep',t:'37.8–38.9',s:91,mar:'9/10 · 1 late',mk:'a',io:'+600',kc:900,n:4,hand:'Admitted → Anu'}];
+SC.dhist=()=>`${sb(1)}${ab('Nursing history','R. Kumar · this admission (18 Sep →)')}<div class="body">
+  <div class="seg"><button onclick="go('dnurse')">Today</button><button class="on">History</button><button onclick="go('dmarh')">MAR</button><button onclick="go('dprev')">Past stays</button></div>
+  ${HDAYS.map(d=>`<button class="bed" onclick="S.hday=${d.d};go('dday')"><div class="row"><b>Day ${d.d} · ${d.date}</b><span class="mut">›</span></div>
+   <div class="row mono" style="font-size:11.5px"><span>T ${d.t}</span><span>SpO₂ ≥${d.s}</span><span>I/O ${d.io}</span></div>
+   <div class="chips">${ch('Meds '+d.mar,d.mk)}${ch(d.kc+' kcal',d.kc<1000?'a':'g')}${ch(d.n+' notes','x')}</div><span class="mut" style="font-size:11px">Handover: ${d.hand}</span></button>`).join('')}
+  <div class="card"><span class="lb">Calories by day (target 1,800)</span>${HDAYS.slice().reverse().map(d=>`<div class="sbarline"><span class="mono" style="width:44px;font-size:11px">Day ${d.d}</span><div class="bar" style="flex:1"><i style="width:${Math.round(d.kc/18)}%"></i></div><span class="mono" style="font-size:11px">${d.kc}</span></div>`).join('')}</div>
+</div>${dnav('dlist')}<div class="toast"></div>`;
+
+SC.dday=()=>{const rows=(S.hday||3)===3?[['06:05','MAR','Pantoprazole given','g'],['06:08','Handover','Night handover acknowledged','p'],['07:24','Vitals','T 38.6 · SpO₂ 95 · alert sent','r'],['08:03','MAR','Ceftriaxone 1 g IV given','g'],['08:05','MAR','Paracetamol held: not indicated','r'],['09:05','Task','CBC sample collected',''],['09:12','Order','Nebulization seen','p'],['09:30','Assess','Morse 45 High','a'],['10:15','Note','Comfortable, mild cough',''],['13:10','Diet','Lunch 50%','a'],['13:42','Handover','Sent to Kavya','p']]
+ :[['06:00','Vitals','T 37.8 · SpO₂ 92',''],['08:00','MAR','Ceftriaxone given','g'],['10:30','Note','Chest physio done',''],['14:10','Handover','Meena → Kavya','p'],['20:00','MAR','Ceftriaxone given','g'],['22:00','Vitals','T 38.4','a']];
+ return `${sb(1)}${ab('Day '+(S.hday||3)+' · nursing entries','R. Kumar · every entry, by time')}<div class="body">
+  <div class="seg">${[1,2,3].map(n=>`<button class="${(S.hday||3)===n?'on':''}" onclick="S.hday=${n};render()">Day ${n}</button>`).join('')}</div>
+  <div class="card"><div class="tl">${rows.map(r=>`<div class="it"><span class="tm">${r[0]}</span><div><div class="row"><span>${r[2]}</span>${ch(r[1],r[3])}</div><span class="mut">${(S.hday||3)===3?'Priya':'Meena / Kavya / Anu'}</span></div></div>`).join('')}</div></div>
+</div>${dnav('dlist')}<div class="toast"></div>`};
+
+SC.dmarh=()=>{const M=[['Ceftriaxone 1 g IV',['✓','✓','✓','✓','✓','•']],['Paracetamol SOS',['✓','✓','✓','✓','H','·']],['Pantoprazole 40',['L','·','✓','·','✓','·']],['Actrapid 6 U SC',['✓','✓','✓','✓','✓','•']]];
+ const col=c=>c==='✓'?'background:#e2f3ea;color:#17804f':c==='H'?'background:#fbe5e3;color:#b3261e':c==='L'?'background:#fbf0d9;color:#9a6200':c==='•'?'background:#e3e8f4;color:#233b77':'color:#c3c9d6';
+ return `${sb(1)}${ab('MAR chart','R. Kumar · whole admission')}<div class="body">
+  <div class="seg"><button onclick="go('dnurse')">Today</button><button onclick="go('dhist')">History</button><button class="on">MAR</button><button onclick="go('dprev')">Past stays</button></div>
+  <div class="card" style="overflow-x:auto"><table style="border-collapse:collapse;font-size:11px;width:100%"><thead><tr><th style="text-align:left;padding:4px">Medicine</th><th colspan="2">Day 1</th><th colspan="2">Day 2</th><th colspan="2">Day 3</th></tr><tr><th></th>${'<th>AM</th><th>PM</th>'.repeat(3)}</tr></thead>
+   <tbody>${M.map(m=>`<tr><td style="padding:5px 4px;font-weight:600">${m[0]}</td>${m[1].map(c=>`<td style="text-align:center;padding:5px 2px;font:700 11px var(--mono);${col(c)}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>
+  <div class="chips">${ch('✓ given','g')}${ch('H held','r')}${ch('L late','a')}${ch('• due')}</div>
+  <div class="card"><span class="lb">Exceptions</span><div class="row"><span>21 Sep 08:05 Paracetamol</span>${ch('Held','r')}</div><span class="mut">Not indicated, T 37.9 · Priya</span><div class="row"><span>19 Sep 06:40 Pantoprazole</span>${ch('Late 40 min','a')}</div><span class="mut">Pharmacy delay · Anu</span></div>
+</div>${dnav('dlist')}<div class="toast"></div>`};
+
+SC.dprev=()=>`${sb(1)}${ab('Previous admissions','R. Kumar')}<div class="body">
+  <div class="seg"><button onclick="go('dnurse')">Today</button><button onclick="go('dhist')">History</button><button onclick="go('dmarh')">MAR</button><button class="on">Past stays</button></div>
+  <div class="card"><div class="row"><b>Mar 2025 · 5 days</b>${ch('4F Ward C','x')}</div><span>Diabetic foot ulcer</span><div class="chips">${ch('Dressings ×10','x')}${ch('Hypoglycaemia GRBS 58','r')}${ch('Braden 13','a')}</div><span class="mut">Day 2 03:00: dextrose given, doctor informed · Anu</span></div>
+  <div class="card"><div class="row"><b>Jul 2024 · 2 days</b>${ch('3F Ward B','x')}</div><span>Acute gastroenteritis</span><div class="chips">${ch('I/O −900 day 1','a')}${ch('IV NS 4 L','x')}</div><span class="mut">Discharged on day 2, tolerating soft diet</span></div>
+  <span class="mut">Tap a stay to see its day-by-day nursing summary, the same as the History tab.</span>
+</div>${dnav('dlist')}<div class="toast"></div>`;
+
+/* ================= spec (right panel) ================= */
+const SPEC={
+ login:{g:'Nurse · Start',t:'Login',p:'Same login for doctors and nurses. The response includes role_type, so the app no longer guesses the role from the role name.',api:[['CHG','DoctorLogIn/LoginVerification','Adds role_type, nurse_user_id and has_allocation_today']],w:'Session token',v:'—',r:['NURSE and CHARGE_NURSE go to shift start; DOCTOR goes to the IP patient list; NS goes to the NS dashboard','Biometric login reuses the existing auth feature'],gaps:['MN-01','WN-01']},
+ shift:{g:'Nurse · Start',t:'Shift start & allocation',p:'Shows today\'s roster: shift window and allotted floors and wards. The pending handover must be acknowledged first.',api:[['NEW','NurseMobile/MyAllocation','Shift, floors, wards, pending handover id'],['CHG','NursingAutomation/ShiftHandover · S_PENDING','Incoming handover for this nurse']],w:'—',v:'NS roster view',r:['Source of truth: nursing_duty_roster (standing roster included), falling back to doctor_user.LocationId','No allocation today means "Contact your nursing superintendent", with no patient access'],gaps:['MN-02','WN-02']},
+ hin:{g:'Nurse · Shift',t:'Receive handover',p:'The incoming nurse reads a per-patient SBAR from the outgoing nurse and acknowledges it.',api:[['CHG','NursingAutomation/ShiftHandover · S_PENDING / ACK','ACK sets acknowledged_at and incoming_nurse_id']],w:'shift_handover.acknowledged_at',v:'Outgoing nurse, charge nurse, doctor (Nursing tab)',r:['Flagged patients shown first','Today acknowledged_at is set when the handover is sent (bug)'],gaps:['WN-13','MN-11']},
+ home:{g:'Nurse · Start',t:'Home',p:'Workload across the allotted floors only, with one large Scan button.',api:[['CHG','NursingAutomation/TaskDashboard','Scope from the token allocation, not the client wardid'],['NEW','NurseMobile/DueList · floor','Meds and vitals due counts']],w:'—',v:'—',r:['Counts are scoped on the server','Tapping a tile opens a filtered list'],gaps:['MN-02']},
+ floors:{g:'Nurse · Find patient',t:'Floor census',p:'Bed list for allotted floors with status chips. Browsing is allowed; recording requires a bed scan.',api:[['NEW','NurseMobile/FloorCensus','Built on BedBoardByLocation + NurseConsolidatedBoard'],['REUSE','NursingLocation/BedBoardByLocation','Bed occupancy']],w:'—',v:'—',r:['Returns 403 for a floor that isn\'t allotted','Flags: MED_OVERDUE, FEVER, VITALS_DUE, NPO, NEW_ORDER'],gaps:['MN-04']},
+ scan:{g:'Nurse · Find patient',t:'Scan bed QR',p:'The camera reads the bed label. The QR holds only a bed id and a signature, and the server decides access.',api:[['NEW','NurseMobile/ScanBed','qr → allowed (grant + patient) or 403 with reason'],['NEW','BedQrLabels (web admin)','Print signed labels per ward']],w:'nurse_bed_access_log (every attempt)',v:'Charge nurse / NS audit',r:['QR format HMSBED:v1:{bedId}:{hmac}; no patient data on the label','The patient is resolved at scan time, so labels survive transfers','Flutter: mobile_scanner package; manual code entry uses the same API'],gaps:['MN-03','WN-17']},
+ denied:{g:'Nurse · Find patient',t:'Access denied',p:'Explains why access was denied and who to contact, and offers a cover request.',api:[['NEW','NurseMobile/ScanBed → 403','reason_code NOT_ALLOCATED | OFF_SHIFT | INVALID_QR, allotted_floors, charge_nurse']],w:'Access log (DENIED)',v:'Charge nurse report',r:['No patient name is shown on a denial','Repeated denials can alert the NS'],gaps:['WN-02']},
+ cover:{g:'Nurse · Find patient',t:'Request temporary cover',p:'Asks the charge nurse of that floor for time-boxed access.',api:[['NEW','NurseMobile/CoverRequest','bed_id, reason, minutes']],w:'nurse_cover_request',v:'Charge nurse of the floor (push)',r:['An approved cover is honoured by fn_NurseCanAccessVisit until it expires','Cover access appears in the audit log'],gaps:['WN-02']},
+ approve:{g:'Charge nurse',t:'Approve cover',p:'The charge nurse approves or declines access requests for their floor.',api:[['NEW','NurseMobile/CoverDecision','APPROVE / DECLINE']],w:'nurse_cover_request.status, valid_until',v:'Requesting nurse (push)',r:['Charge nurses have read access to all floors','Writes still need the roster or a cover'],gaps:['MN-01']},
+ vacant:{g:'Nurse · Find patient',t:'Vacant bed',p:'The bed exists but no patient occupies it.',api:[['NEW','NurseMobile/ScanBed → state VACANT','Includes the cleaned-at time']],w:'—',v:'—',r:['No patient data'],gaps:[]},
+ moved:{g:'Nurse · Find patient',t:'Patient transferred',p:'The label is valid, but the patient has moved. Access to the new bed follows allocation.',api:[['NEW','NurseMobile/ScanBed → state MOVED','to_bed plus allowed flag']],w:'—',v:'—',r:['If the new floor isn\'t allotted, the denied screen is shown'],gaps:[]},
+ hub:{g:'Nurse · Bedside',t:'Patient hub',p:'Opens after an allowed scan. The allergy banner stays visible, with due items, latest vitals, the doctor\'s latest instruction, and new orders to acknowledge.',api:[['NEW','NurseMobile/PatientSnapshot','Header, allergies, due, doctor note, orders'],['REUSE','NurseConsole/NurseConsole_Common · PHDR','Header + allergies'],['NEW','DoctorOrders · ACK','Order acknowledgement']],w:'doctor_order_event (ACK)',v:'Doctor sees "Seen by Priya"',r:['Without a scan the hub is view-only; write tiles route to the scanner','The grant expires at shift end'],gaps:['MN-04','MN-08','WD-07']},
+ docsum:{g:'Nurse · Bedside',t:'Doctor summary',p:'Everything the doctor wants done, without opening the EMR: diagnosis, notify-if limits, latest note, medicines, investigations, orders and diet.',api:[['NEW','NurseMobile/PatientSnapshot','Aggregates the sources below'],['REUSE','NurseConsole/NurseConsole_Prescription · LST','Active medicines'],['REUSE','Ipmanagement/NursingNotes · notes_type 2','Doctor notes']],w:'—',v:'—',r:['Read-only for nurses','Unacknowledged orders can be acknowledged here'],gaps:['MN-08','WN-07']},
+ vitals:{g:'Nurse · Bedside',t:'Record vitals',p:'Fast numeric entry with limits from the doctor\'s notify-if thresholds. Values outside the limits alert the doctor.',api:[['CHG','Ipmanagement/Vitalsmonitoring · I','created_by from token, adds grbs/o2, returns alerts[]'],['NEW','NursingAlerts','Raised on a breach → doctor push'],['CHG','NursingAutomation/TaskCompletion','Auto-completes the matching vitals task']],w:'ip_vitalsmonitoring_details',v:'Doctor: timeline, EMR vitals, Nursing tab, push alert',r:['Needs a valid bed grant','Offline: queued with the original timestamp'],gaps:['MN-05','WD-06']},
+ vtrend:{g:'Nurse · Bedside',t:'Vitals trend',p:'24-hour trend with the doctor\'s threshold line, and all readings with who recorded them.',api:[['REUSE','Ipmanagement/Vitalsmonitoring · S','List'],['REUSE','NurseConsole/NurseConsole_Common · VITS','Vitals strip']],w:'—',v:'—',r:['Same data the doctor sees'],gaps:[]},
+ mar:{g:'Nurse · Bedside',t:'Medication (MAR)',p:'Per-patient due list for the round. Only doses that pharmacy has dispensed appear.',api:[['REUSE','NurseConsole/NurseConsole_MAR · DAY','Doses for the day'],['NEW','NurseMobile/DueList','Due and overdue'],['FIX','NursingAutomation/MedicationSchedule','Retire from the app (hospital-wide list)']],w:'—',v:'—',r:['Doses are generated from medicine_prescription (GenerateDoses sets ward and branch)','SOS medicines show their criteria'],gaps:['MN-06','WN-04','WN-05','WN-06']},
+ admin:{g:'Nurse · Bedside',t:'Administer dose',p:'Five-rights check, allergy caution, site and batch. A dose not given needs a status and a reason.',api:[['CHG','NurseConsole/NurseConsole_MAR · ADM','Nurse from token, access_grant required, reason required unless GIVEN'],['REUSE','NurseConsole/NurseConsole_Common · ALCK','Allergy check'],['NEW','NursingAlerts','HELD/REFUSED of a critical medicine → doctor']],w:'medication_delivery_schedule (GIVEN / HELD / REFUSED / NPO / DELAYED)',v:'Doctor: Nursing tab MAR, alert; nurse console on web',r:['Online only (no offline MAR, to prevent double dosing)','Phase 2: scan the wristband and the medicine barcode'],gaps:['MN-06','WN-04','WD-01']},
+ io:{g:'Nurse · Bedside',t:'Intake / output',p:'Quick entry by type and volume with a running balance.',api:[['CHG','Ipmanagement/Fluids · I','created_by from token, soft delete; the app must await the save']],w:'Fluids table',v:'Doctor: timeline "IV Fluids", Nursing tab balance',r:['A negative balance beyond the doctor\'s limit raises a flag on the doctor list'],gaps:['MN-05','MN-13']},
+ diet:{g:'Nurse · Bedside',t:'Nutrition',p:'Shows the diet order and records how much of each meal was eaten, with kcal against the target.',api:[['REUSE','IpDietV2/TodayBoard','Meals for today'],['CHG','IpDietV2/MarkConsumption','Also writes ip_diet_consumption in HMS'],['FIX','NursingAutomation/DietDelivery','Retire (legacy, 0 rows)']],w:'MOP + ip_diet_consumption',v:'Doctor: Nursing tab kcal; dietitian',r:['A meal refused twice in a row alerts the doctor and dietitian'],gaps:['MN-07','WN-15']},
+ notes:{g:'Nurse · Bedside',t:'Nursing notes',p:'Categorised notes, with an SBAR template for escalating to the doctor.',api:[['CHG','Ipmanagement/NursingNotes · I','note_category, created_by from token, reviewed_by']],w:'ip_nursing_notes',v:'Doctor: IP timeline, Nursing tab',r:['No hard delete; corrections are logged'],gaps:['WN-17','WD-10']},
+ assess:{g:'Nurse · Bedside',t:'Assessments',p:'Structured scales (Morse, Braden, pain, nutrition) with automatic risk level and the next due time.',api:[['NEW','NursingAssessment · I/S','type, answers, score → next_due + task']],w:'nursing_assessment',v:'Doctor: Nursing tab',r:['A high-risk score starts the care bundle as tasks'],gaps:['WN-16','MN-12']},
+ tasks:{g:'Nurse · Shift',t:'My tasks',p:'Tasks from templates, doctor orders and lab orders. Completing a task can require evidence (vitals or a sample barcode).',api:[['CHG','NursingAutomation/NursingTask · S_NURSE','Scoped on the server; errors shown instead of an empty list'],['CHG','NursingAutomation/TaskCompletion','vitals_record_id, photo_url'],['REUSE','NursingAutomation/TaskStatusUpdate','Defer / escalate']],w:'nursing_task_completion',v:'Charge nurse board; doctor (order status)',r:['Overdue escalation runs as a SQL Agent job'],gaps:['MN-09','WN-11','WN-12']},
+ alerts:{g:'Nurse · Shift',t:'Alerts',p:'New doctor orders, cover decisions, overdue doses and lab tasks.',api:[['REUSE','NursingAutomation/NurseTaskNotification · LIST','Inbox'],['NEW','PushToken','FCM registration']],w:'—',v:'—',r:['Push notifications and the in-app list use the same data'],gaps:['MN-11']},
+ handover:{g:'Nurse · Shift',t:'Send handover',p:'SBAR per patient, filled in automatically from today\'s charting and sent to the incoming nurse.',api:[['CHG','NursingAutomation/ShiftHandover · I','patients_json (fixes the [object Object] bug), nurse ids from the roster']],w:'shift_handover, shift_handover_patient',v:'Incoming nurse, charge nurse, doctor',r:['Reminder at 13:30'],gaps:['WN-13','MN-11']},
+ profile:{g:'Nurse · Start',t:'Profile',p:'Identity, today\'s allocation, shift stats and sign-out.',api:[['NEW','NurseMobile/MyAllocation','']],w:'—',v:'—',r:['Sign-out clears the access grants'],gaps:[]},
+ opq:{g:'Nurse · OP',t:'OP triage queue',p:'Patients join the queue automatically at check-in. The nurse takes them in token order.',api:[['REUSE','NursingAutomation/OPDoctorList','Doctor list'],['CHG','NursingAutomation/OPQueue','DAL must pass @P_LocationIds'],['CHG','NursingAutomation/OPQueueStatusUpdate','Status changes'],['CHG','PatientWatchlistDash/Patient_checkin','Inserts into op_nurse_queue']],w:'op_nurse_queue',v:'Doctor: "Vitals ready" badge',r:['OP rooms are scoped by location, not bed QR'],gaps:['WN-08','WN-10']},
+ opv:{g:'Nurse · OP',t:'OP triage vitals',p:'Vitals including sugar type, allergies, pain, fall risk and nutrition screen, saved to the visit record the doctor reads.',api:[['CHG','NursingAutomation/OPVitalsEntry · I','nurse from token, blood_sugar_type, writes visit-report vitals, correct visit id']],w:'Visit-report vitals (not only vitals_monitoring)',v:'Doctor case sheet, web and app',r:['Range validation as for IP'],gaps:['WN-09','WD-04','MN-10','MD-05']},
+ dlist:{g:'Doctor · IP',t:'IP patients',p:'The doctor\'s list gains nursing flags: fever, held doses, poor intake, fluid balance and unseen orders.',api:[['CHG','IP patient list SP','Adds nursing flags']],w:'—',v:'—',r:['Flags come from the same tables nurses write to'],gaps:['MD-02','WD-03']},
+ dnurse:{g:'Doctor · IP',t:'Nursing tab (today)',p:'One view of all nursing work for the patient. This replaces opening the nurse console on the web.',api:[['NEW','NurseMobile/NursingSummary','Vitals, MAR, I/O, diet, notes, tasks, assessments, handover, orders']],w:'—',v:'—',r:['The web IP view uses the same API'],gaps:['MD-01','WD-01','WD-02']},
+ dorder:{g:'Doctor · IP',t:'Nursing orders',p:'Structured nursing orders. The doctor can see whether each one is sent, seen or done, and by which nurse.',api:[['NEW','DoctorOrders · Ins / List','Also calls GenerateTasksForOrder'],['CHG','NursingAutomation/GenerateTasksForOrder','Wired for the first time']],w:'doctor_order, nursing_task',v:'Nurses on that floor (push + hub card)',r:['Notify-if orders set the vitals thresholds used on the nurse side'],gaps:['MD-04','MD-07','WN-07']},
+ dalert:{g:'Doctor · IP',t:'Alerts',p:'Push alerts from nursing: out-of-range vitals, held or refused doses, refused meals.',api:[['NEW','NursingAlerts · LIST / ACK',''],['NEW','PushToken','']],w:'nursing_alert.ack_at',v:'Nurse sees the doctor acknowledged',r:['Unacknowledged critical alerts escalate to the duty doctor after 15 minutes'],gaps:['MD-03','WD-06']},
+ d_opq:{g:'Doctor · OP',t:'OP queue',p:'The doctor\'s OP list shows each patient\'s triage status and the flags the nurse raised (high BP, high sugar, allergy) before calling them in.',api:[['CHG','Dashboard/select_Appointment_Request','Join op_nurse_queue status, nurse, time, flags'],['CHG','PatientWatchlistDash/Patient_checkin','Check-in adds to the queue']],w:'—',v:'—',r:['Same data as the web OP queue'],gaps:['WD-05','WN-08']},
+ d_opcase:{g:'Doctor · OP',t:'Consult · nurse triage',p:'Everything captured at triage appears on the consult: vitals with highlights, allergy banner, pain, fall risk, nutrition, psychosocial answers and the previous visit. The doctor can send OP procedures to the nurse and track them.',api:[['CHG','CaseStudy/Patient_General_Information_Ins_Sel','Return the nurse triage block'],['NEW','DoctorOrders · OP_PROCEDURE','']],w:'Review flag, OP orders',v:'OP nurse (task)',r:['Allergy banner stays visible while prescribing'],gaps:['MD-05','WD-04']},
+ dhist:{g:'Doctor · IP',t:'Nursing history',p:'One card per day of the admission: temperature range, lowest SpO₂, doses given, held or late, I/O, calories, notes and handovers. Tap a day for all its entries.',api:[['NEW','NurseMobile/NursingSummary · from/to, group=day','']],w:'—',v:'—',r:['Same API as the web Nursing history tab'],gaps:['MD-01','WD-02']},
+ dday:{g:'Doctor · IP',t:'Day detail',p:'Every nursing entry for a day in time order, with the nurse who recorded it.',api:[['NEW','NurseMobile/NursingTimeline · date','']],w:'—',v:'—',r:[],gaps:['MD-01']},
+ dmarh:{g:'Doctor · IP',t:'MAR chart',p:'Medicines by day and dose, showing given, held, late or due, plus an exceptions list.',api:[['REUSE','NurseConsole/NurseConsole_MAR · GRID','Read-only for doctors']],w:'—',v:'—',r:[],gaps:['MD-01','WD-01']},
+ dprev:{g:'Doctor · IP',t:'Previous admissions',p:'Nursing summaries of earlier IP stays with key events (for example a hypoglycaemia episode).',api:[['NEW','NurseMobile/NursingSummary · past visit_reportid','']],w:'—',v:'—',r:[],gaps:['New']}
+};
+const ORDER=['login','shift','hin','home','profile','floors','scan','denied','cover','vacant','moved','hub','docsum','vitals','vtrend','mar','admin','io','diet','notes','assess','tasks','alerts','handover','opq','opv','approve','d_opq','d_opcase','dlist','dnurse','dhist','dday','dmarh','dprev','dorder','dalert'];
+const GROUPS=['Nurse · Start','Nurse · Find patient','Nurse · Bedside','Nurse · Shift','Nurse · OP','Charge nurse','Doctor · OP','Doctor · IP'];
+
+/* ================= render ================= */
+function go(id,push){if(push!==false&&S.cur&&S.cur!==id)S.stack.push(S.cur);S.cur=id;render();}
+function back(){S.cur=S.stack.pop()||'home';render();}
+function jump(id){if(['hub','docsum','vitals','mar','admin','io','diet','notes','assess'].includes(id))S.granted=true;if(id==='hin')S.hinAck=false;if(id==='approve'&&S.cover==='none')S.cover='pending';go(id);}
+function render(){
+  const scr=$('#screen');scr.innerHTML=SC[S.cur]();if(!scr.querySelector('.toast'))scr.insertAdjacentHTML('beforeend','<div class="toast"></div>');
+  const b=scr.querySelector('.body');if(b)b.scrollTop=0;
+  if(S.cur==='vitals')checkV();
+  const sp=SPEC[S.cur];const idx=ORDER.indexOf(S.cur);
+  $('#spec').innerHTML=`<span class="g">${sp.g} · screen ${idx+1} of ${ORDER.length}</span><h3>${sp.t}</h3><p>${sp.p}</p>
+   <div><div class="lbl">APIs</div><div class="apis">${sp.api.map(a=>`<div class="apirow"><span class="tag ${a[0]}">${a[0]}</span><code>${a[1]}</code>${a[2]?`<span class="d">${a[2]}</span>`:''}</div>`).join('')}</div></div>
+   <dl class="kv"><dt>Writes to</dt><dd>${sp.w}</dd><dt>Visible to</dt><dd>${sp.v}</dd></dl>
+   ${sp.r.length?`<div><div class="lbl">Rules</div><ul class="rules">${sp.r.map(r=>`<li>${r}</li>`).join('')}</ul></div>`:''}
+   ${sp.gaps.length?`<div><div class="lbl">Closes gaps</div><div class="gapref">${sp.gaps.map(g=>`<span>${g}</span>`).join('')}</div></div>`:''}
+   <div class="flowhint">${idx>0?`<button class="btn sm gh" onclick="jump('${ORDER[idx-1]}')">‹ ${SPEC[ORDER[idx-1]].t}</button> `:''}${idx<ORDER.length-1?`<button class="btn sm" onclick="jump('${ORDER[idx+1]}')">${SPEC[ORDER[idx+1]].t} ›</button>`:''}</div>`;
+  document.querySelectorAll('#navlist button').forEach(x=>x.setAttribute('aria-current',x.dataset.id===S.cur?'true':'false'));
+  $('#pickSel').value=S.cur;
+}
+function buildNav(){
+  $('#navlist').innerHTML=GROUPS.map(g=>`<div class="navgrp"><h2>${g}</h2>${ORDER.filter(id=>SPEC[id].g===g).map(id=>`<button data-id="${id}" onclick="jump('${id}')"><span class="n">${String(ORDER.indexOf(id)+1).padStart(2,'0')}</span>${SPEC[id].t}</button>`).join('')}</div>`).join('');
+  $('#pickSel').innerHTML=GROUPS.map(g=>`<optgroup label="${g}">${ORDER.filter(id=>SPEC[id].g===g).map(id=>`<option value="${id}">${String(ORDER.indexOf(id)+1).padStart(2,'0')} · ${SPEC[id].t}</option>`).join('')}</optgroup>`).join('');
+  $('#pickSel').onchange=e=>jump(e.target.value);
+}
+function renderAll(){
+  const keep=S.cur;const out=[];
+  ORDER.forEach((id,i)=>{S.cur=id;if(['hub','vitals','mar','admin','io','diet','notes','assess','docsum'].includes(id))S.granted=true;
+    out.push(`<figure><div class="device"><div class="scr">${SC[id]()}</div></div><figcaption><b>${String(i+1).padStart(2,'0')} · ${SPEC[id].t}</b>${SPEC[id].g}</figcaption></figure>`)});
+  S.cur=keep;$('#allView').innerHTML=out.join('');
+}
+function setMode(all){$('#flowView').hidden=all;$('#allView').hidden=!all;$('#m-flow').setAttribute('aria-pressed',String(!all));$('#m-all').setAttribute('aria-pressed',String(all));if(all)renderAll();else render();}
+$('#m-flow').onclick=()=>setMode(false);$('#m-all').onclick=()=>setMode(true);
+$('#m-reset').onclick=()=>{S=fresh();setMode(false);};
+buildNav();render();
+</script>
+</body>
+</html>
