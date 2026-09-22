@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nursing Build Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,650&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f3f5f8; --surface:#ffffff; --sunk:#e9edf3; --ink:#172033; --ink2:#4a556b; --ink3:#7a8499; --line:#d8dee8; --navy:#233b77;
+  --ok:#17804f; --ok-bg:#e2f3ea; --prog:#2b5fb3; --prog-bg:#e3ecfa; --new:#6b3fa0; --new-bg:#efe6f8; --mod:#9a6200; --mod-bg:#fbf0d9; --sql:#0e7490; --sql-bg:#dff3f7;
+  --p0:#5b6b8c; --p1:#2b5fb3; --p2:#b3261e; --p3:#17804f; --p4:#9a6200; --p5:#6b3fa0; --p6:#0e7490;
+  --serif:"Fraunces",Georgia,serif; --sans:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  color-scheme:dark; --bg:#0d121c; --surface:#161d2b; --sunk:#1e2638; --ink:#e7ebf3; --ink2:#b3bccd; --ink3:#8792a8; --line:#2c3549; --navy:#8fa8e8;
+  --ok:#5fcf97; --ok-bg:#15352a; --prog:#86aef0; --prog-bg:#1c2c4a; --new:#c6a2f0; --new-bg:#2e2342; --mod:#e8b457; --mod-bg:#3a2d12; --sql:#67d0e4; --sql-bg:#123640;
+  --p0:#9aa8c8; --p1:#86aef0; --p2:#f08a80; --p3:#5fcf97; --p4:#e8b457; --p5:#c6a2f0; --p6:#67d0e4;
+}}
+:root[data-theme="dark"]{
+  color-scheme:dark; --bg:#0d121c; --surface:#161d2b; --sunk:#1e2638; --ink:#e7ebf3; --ink2:#b3bccd; --ink3:#8792a8; --line:#2c3549; --navy:#8fa8e8;
+  --ok:#5fcf97; --ok-bg:#15352a; --prog:#86aef0; --prog-bg:#1c2c4a; --new:#c6a2f0; --new-bg:#2e2342; --mod:#e8b457; --mod-bg:#3a2d12; --sql:#67d0e4; --sql-bg:#123640;
+  --p0:#9aa8c8; --p1:#86aef0; --p2:#f08a80; --p3:#5fcf97; --p4:#e8b457; --p5:#c6a2f0; --p6:#67d0e4;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:14px/1.55 var(--sans);margin:0}
+.wrap{max-width:1380px;margin:0 auto;padding-inline:18px;padding-block:20px 80px}
+.docnav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.docnav a{font-size:13px;text-decoration:none;color:var(--ink2);padding:6px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface)}
+.docnav a[aria-current="page"]{background:var(--navy);border-color:var(--navy);color:var(--surface)}
+h1{font:650 clamp(28px,4.5vw,40px)/1.1 var(--serif);margin:0}
+h2{font:650 22px/1.2 var(--serif);margin:0}
+.lede{color:var(--ink2);max-width:90ch;margin:8px 0 0}
+.top{display:grid;gap:14px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.sync{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--ink2)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ink3);display:inline-block;margin-right:5px}
+.dot.live{background:var(--ok);box-shadow:0 0 0 3px var(--ok-bg)}
+.btn{font:600 12.5px/1 var(--sans);padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.btn.pri{background:var(--navy);color:var(--surface);border-color:var(--navy)}
+button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid #4c7bd9;outline-offset:2px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:4px}
+.kpi .l{font:700 11px/1.2 var(--sans);letter-spacing:.07em;text-transform:uppercase;color:var(--ink3)}
+.kpi b{font:700 26px/1 var(--sans);font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:99px;background:var(--sunk);overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.bar .d{background:var(--ok)} .bar .p{background:var(--prog)}
+section{padding-top:30px;display:grid;gap:14px}
+/* timeline */
+.tlwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.tl{min-width:900px;display:grid;grid-template-columns:190px repeat(10,1fr);gap:4px 3px;align-items:center;position:relative}
+.tl .wk{font:600 11px/1.3 var(--sans);color:var(--ink3);text-align:center}
+.tl .wk b{display:block;color:var(--ink2)}
+.tl .ph{font:600 12.5px/1.3 var(--sans);display:flex;justify-content:space-between;gap:6px;padding-right:8px}
+.tl .ph span{font:600 11px var(--mono);color:var(--ink3)}
+.tl .gbar{height:26px;border-radius:6px;position:relative;overflow:hidden;display:flex;align-items:center;padding-left:8px;font:700 11px var(--sans);color:#fff}
+.tl .gbar .fill{position:absolute;inset:0 auto 0 0;background:rgba(255,255,255,.28)}
+.tl .gbar span{position:relative}
+.today{position:absolute;top:0;bottom:0;width:2px;background:#e8543a;pointer-events:none}
+.today::after{content:"Today";position:absolute;top:-2px;left:4px;font:700 10px var(--sans);color:#e8543a}
+/* filters */
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+.filters select,.filters input{font:500 13px var(--sans);padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.filters input{min-width:200px;flex:1}
+.filters label{font-size:12px;color:var(--ink3);font-weight:600}
+/* phases */
+.phase{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.phase>summary{list-style:none;cursor:pointer;padding:14px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.phase>summary::-webkit-details-marker{display:none}
+.pbadge{font:700 12px var(--mono);color:#fff;border-radius:8px;padding:6px 9px}
+.phase .pt{display:grid;gap:3px}
+.phase .pt b{font-size:16px}
+.phase .pt span{font-size:12.5px;color:var(--ink2)}
+.phase .pp{display:grid;gap:4px;min-width:170px;text-align:right;font-size:12px;color:var(--ink2)}
+.exit{margin:0 16px 12px;padding:10px 12px;border-radius:10px;background:var(--sunk);font-size:13px}
+.task{border-top:1px solid var(--line);display:grid;grid-template-columns:78px 1fr 160px;gap:10px;padding:12px 16px;align-items:start}
+.task.done{background:color-mix(in srgb,var(--ok-bg) 45%,transparent)}
+.task .id{font:600 12px/1.5 var(--mono);color:var(--ink3)}
+.task .ti{display:grid;gap:6px}
+.task .ti b{font-size:14px}
+.task .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.lay{font:700 10.5px/1 var(--sans);padding:4px 7px;border-radius:99px;background:var(--sunk);color:var(--ink2)}
+.lay.DB{background:var(--sql-bg);color:var(--sql)} .lay.API{background:var(--prog-bg);color:var(--prog)} .lay.Web{background:var(--mod-bg);color:var(--mod)} .lay.Mobile{background:var(--new-bg);color:var(--new)} .lay.QA,.lay.Ops{background:var(--sunk);color:var(--ink2)}
+.flag{font:600 10.5px var(--mono);padding:3px 6px;border-radius:5px;border:1px dashed var(--line);color:var(--ink2)}
+.dep{font-size:11.5px;color:var(--ink3)}
+.files{display:grid;gap:3px;margin:2px 0 0;padding:0;list-style:none}
+.files li{display:grid;grid-template-columns:44px 1fr;gap:8px;align-items:start;font:500 12px/1.45 var(--mono);color:var(--ink2);word-break:break-word}
+.fk{font:700 9.5px/1 var(--mono);padding:3px 0;border-radius:4px;text-align:center}
+.fk.NEW{background:var(--new-bg);color:var(--new)} .fk.MOD{background:var(--mod-bg);color:var(--mod)} .fk.SQL{background:var(--sql-bg);color:var(--sql)} .fk.CFG{background:var(--sunk);color:var(--ink2)}
+.task details summary{cursor:pointer;font-size:12.5px;color:var(--navy);font-weight:600}
+.st{display:grid;gap:6px;justify-items:end}
+.st select{font:600 12.5px var(--sans);padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100%}
+.fin{font:700 11.5px var(--sans);color:var(--ok)}
+.inprog{font:700 11.5px var(--sans);color:var(--prog)}
+.note{font-size:11.5px;color:var(--ink3);text-align:right}
+.acc{font-size:12.5px;color:var(--ink2)}
+@media (max-width:760px){.task{grid-template-columns:1fr}.st{justify-items:start}.phase>summary{grid-template-columns:auto 1fr}.phase .pp{grid-column:1/-1;text-align:left}}
+.howto{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:8px;align-content:start}
+.card h3{margin:0;font:700 15px var(--sans)}
+.card ol,.card ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:13px;color:var(--ink2)}
+code{font-family:var(--mono);font-size:12px;background:var(--sunk);padding:1px 5px;border-radius:4px}
+.hidden{display:none!important}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(10px);background:#172033;color:#fff;border-radius:10px;padding:10px 16px;font-size:13px;opacity:0;transition:.2s;pointer-events:none;z-index:9}
+.toast.show{opacity:1;transform:translateX(-50%)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="docnav" aria-label="Documents">
+  <a href="nursing-flow-blueprint.html">1 · Blueprint</a>
+  <a href="nursing-gaps-and-apis.html">2 · Gaps &amp; API spec</a>
+  <a href="nurse-mobile-prototype.html">3 · Nurse app (mobile)</a>
+  <a href="doctor-console-web.html">4 · Doctor console (web)</a>
+  <a href="doctor-mobile-prototype.html">5 · Doctor app (mobile)</a>
+  <a href="implementation-tracker.html" aria-current="page">6 · Build tracker</a>
+</nav>
+
+<header class="top">
+  <span style="font:700 12px/1 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--navy)">HMS nursing · final plan · 7 phases · 10 weeks · file-level · patient safety included · security &amp; engineering parked</span>
+  <h1>Nursing Build Tracker</h1>
+  <p class="lede">Every task lists the exact files to create or change in <b>DBScripts</b>, <b>DoctorAPI</b> (API · Businesslayer · DataAccessLayer · EntityLayer), <b>DoctorApplication</b> (web MVC · Views · JS) and <b>DoctorApp</b> (Flutter). Status is read live from <code>tracker-status.json</code> next to this page, so when someone implements a task and commits the updated status file, everyone's page updates within a minute.</p>
+  <div class="sync" aria-live="polite"><span><span class="dot" id="syncDot"></span><span id="syncText">Loading status…</span></span><span id="localText"></span>
+    <button class="btn" id="btnRefresh">Refresh now</button><button class="btn pri" id="btnExport">Download status file</button><button class="btn" id="btnCopy">Copy status JSON</button><button class="btn" id="btnClear">Discard my local edits</button></div>
+  <div class="kpis">
+    <div class="kpi"><span class="l">Overall</span><b id="kPct">0%</b><div class="bar"><i class="d" id="kBarD"></i><i class="p" id="kBarP"></i></div></div>
+    <div class="kpi"><span class="l">Tasks finished</span><b id="kDone">0</b></div>
+    <div class="kpi"><span class="l">In progress</span><b id="kProg">0</b></div>
+    <div class="kpi"><span class="l">Total tasks</span><b id="kTotal">0</b></div>
+    <div class="kpi"><span class="l">Files touched</span><b id="kFiles">0</b></div>
+    <div class="kpi"><span class="l">Current week</span><b id="kWeek">—</b></div>
+  </div>
+</header>
+
+<section aria-labelledby="h-tl">
+  <h2 id="h-tl">Timeline</h2>
+  <div class="tlwrap"><div class="tl" id="timeline"></div></div>
+</section>
+
+<section aria-labelledby="h-tasks">
+  <h2 id="h-tasks">Phases and tasks</h2>
+  <div class="filters" role="group" aria-label="Filter tasks">
+    <label for="fPhase">Phase</label><select id="fPhase"><option value="all">All</option></select>
+    <label for="fLayer">Layer</label><select id="fLayer"><option value="all">All</option><option>DB</option><option>API</option><option>Web</option><option>Mobile</option><option>QA</option><option>Ops</option></select>
+    <label for="fStatus">Status</label><select id="fStatus"><option value="all">All</option><option value="todo">Not started</option><option value="doing">In progress</option><option value="done">Finished</option></select>
+    <label for="fSafety">Scope</label><select id="fSafety"><option value="all">All</option><option value="safety">Patient safety only</option></select>
+    <input id="fSearch" type="search" placeholder="Search task or file path (e.g. NurseConsole.js)" aria-label="Search">
+    <span id="fCount" style="font-size:12px;color:var(--ink3)"></span>
+  </div>
+  <div id="phases" style="display:grid;gap:14px"></div>
+</section>
+
+<section aria-labelledby="h-parked">
+  <h2 id="h-parked">Parked (decision 22 Sep 2026): not in this plan</h2>
+  <p class="lede" style="margin:0">Security and engineering hardening items are parked by decision and are <b>not scheduled</b> in the 10 weeks. They stay listed so the go-live decision is made knowingly. The plan above delivers the features without breaking today's screens, with the patient-safety corrections included. These items decide whether it is fit for hospital-wide production.</p>
+  <div class="howto">
+    <div class="card"><h3>Security</h3><ul>
+      <li><b>S1</b> App accepts any SSL certificate: <code>DoctorApp/lib/main.dart:18</code>, WebView PROCEED in <code>form_index.dart:164</code>, <code>chat/…/index.dart:185</code></li>
+      <li><b>S2</b> Plain-text secrets in <code>DoctorAPI/Web.config</code> (DB admin, SMTP, payment, Firebase keys)</li>
+      <li><b>S3</b> No anti-forgery (CSRF) protection on web posts</li>
+      <li><b>S4</b> 1-month tokens, no refresh or revocation (the plan still removes the password claim, P0-03)</li>
+      <li><b>S5</b> Patient names in push notification text</li></ul></div>
+    <div class="card"><h3>Engineering</h3><ul>
+      <li><b>E1</b> No automated tests (API and Flutter)</li>
+      <li><b>E2</b> No CI/CD pipeline</li>
+      <li><b>E3</b> Stored procedures not in source control (614 referenced, 338 scripts in repo)</li>
+      <li><b>E4</b> New HttpClient per call + <code>.Result</code> in web proxies</li>
+      <li><b>E5</b> API errors returned as empty results</li>
+      <li><b>E6</b> Web app on .NET 4.5.1</li>
+      <li><b>E7</b> No load test, indexes or monitoring for new queries</li>
+      <li><b>E8</b> No DB rollback scripts or runbook</li></ul></div>
+  </div>
+</section>
+
+<section aria-labelledby="h-how">
+  <h2 id="h-how">How live tracking works</h2>
+  <div class="howto">
+    <div class="card"><h3>For whoever implements a task</h3><ol>
+      <li>Change the task's status on this page (Not started → In progress → Finished) and add a note, such as the PR or commit.</li>
+      <li>Click <b>Download status file</b> to get the updated <code>tracker-status.json</code>.</li>
+      <li>Commit it to the same folder as this page (GitHub: <code>nursing-review/</code>).</li>
+      <li>Every viewer's page picks it up within 60 seconds (auto-refresh).</li></ol></div>
+    <div class="card"><h3>Rules</h3><ul>
+      <li>A task is marked <b>✅ FINISHED</b> only when its acceptance check passes. Unstarted tasks carry no marker.</li>
+      <li>Your edits are kept in this browser until the status file is committed. "Discard my local edits" returns to the committed status.</li>
+      <li>Feature flags stay <b>off</b> until the phase exit check passes.</li>
+      <li>File paths: <code>DoctorAPI/…</code>, <code>DoctorApplication/…</code> and <code>DBScripts/…</code> are in <i>Healthcare Management System</i>; <code>DoctorApp/…</code> is the Flutter repo. NEW = create, MOD = change, SQL = migration / SP script.</li></ul></div>
+  </div>
+</section>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================ PLAN DATA ============================ */
+const START='2026-09-28'; // Monday of week 1 (override in tracker-status.json → startDate)
+const PHASES=[
+ {id:'P0',name:'Foundations',weeks:[1,1],goal:'Token, roles, flags, response standard, config. Nothing visible changes.',exit:'Full regression list passes on web, DoctorApp and PatientApp with old and new tokens; clinical safety owner named and the rules document is under review.'},
+ {id:'P1',name:'Access & allocation',weeks:[2,3],goal:'Nurse and doctor access checks, bed QR, scan, cover, My Floors.',exit:'Pilot one floor with enforce_nurse_scope ON; web nurse screens still work for doctors and admin.'},
+ {id:'P2',name:'MAR & medicine ordering',weeks:[3,5],goal:'One MAR status set, mobile administer, PRN, frequency times, IP-only dose generation, OP allergy warning. Patient safety: single-administration guard, PRN limits, MAR audit trail.',exit:'MAR identical on web and mobile; OP and discharge prescriptions create no doses; a second administration of the same dose is rejected; every MAR change has an audit row; clinical rules signed off.'},
+ {id:'P3',name:'Charting & OP',weeks:[5,6],goal:'Vitals / I/O / notes on mobile, OP triage into the case sheet, check-in → nurse queue.',exit:'Nurse OP vitals appear on the doctor case sheet (web + app) without re-entry.'},
+ {id:'P4',name:'Nutrition, tasks, handover',weeks:[6,7],goal:'Diet mirror + nutrition screens, doctor orders as tasks, overdue jobs, handover, alerts, assessments.',exit:'Diet, tasks and handover visible to the doctor; no data loss on legacy pages.'},
+ {id:'P5',name:'Doctor side & forms',weeks:[7,9],goal:'Nursing Summary on web + doctor app, escalations, timeline, DoctorWorkspace, Forms Workspace on mobile.',exit:'A doctor sees every nurse record on web and mobile; forms identical in both.'},
+ {id:'P6',name:'Rollout',weeks:[9,10],goal:'Flags on floor by floor, kiosks keyed, training, store release, monitoring.',exit:'Two weeks on the pilot with no Sev-1 and a clinical safety review with zero unresolved safety incidents before hospital-wide.'}
+];
+const A='DoctorAPI/', W='DoctorApplication/DoctorApplication/', D='DBScripts/NursingMobile/', M='DoctorApp/lib/';
+// [id, phase, layer, title, files[[kind,path]], acceptance, depends, flag, patientSafety]
+const T=[
+// ---------------- P0 ----------------
+['P0-01','P0','DB','Feature-flag table + per-hospital flags',[['SQL',D+'00_feature_flags.sql (HmsFeatureFlag: hospital_id, flag, enabled)'],['SQL',D+'00b_seed_flags.sql (enforce_nurse_scope, op_nurse_triage, mar_auto_generate, mar_frequency_times, temp_unit = off / F)']],'Flags readable by SPs via fn_HmsFlag(hospital, flag); all default off.','',''],
+['P0-02','P0','DB','role_type on the role master + backfill',[['SQL',D+'01_role_type.sql (ALTER role master ADD role_type; backfill DOCTOR / NURSE / NS from role name)'],['SQL','SP_LoginVerification (DB): return role_type, nurse_user_id, has_allocation_today (appended columns)']],'Every existing role has a role_type; login returns it; old columns unchanged.','',''],
+['P0-03','P0','API','JWT: add UserId / RoleId / HospitalId / BranchId, remove password, key to config',[['MOD',A+'DoctorAPI/Controllers/DoctorLogInController.cs (GetToken ~331–354)'],['CFG',A+'DoctorAPI/Web.config (appSettings JwtKey, JwtIssuer)'],['NEW',A+'DoctorAPI/Helpers/UserContext.cs (claims first, body fallback)']],'New tokens carry the claims and no password; tokens already issued still work.','',''],
+['P0-04','P0','API','Response + error standard for new endpoints',[['NEW',A+'DoctorAPI/Helpers/ApiResult.cs ({status,msg,code,data:{Table}}, HTTP 200 for business denials)']],'Unit test: denial returns 200 + status:false + code; 401 only for token problems.','',''],
+['P0-05','P0','API','LoginVerification returns role_type fields',[['MOD',A+'DoctorAPI/Controllers/DoctorLogInController.cs'],['MOD',A+'Businesslayer/Classes/BDoctorLogIn.cs'],['MOD',A+'DataAccessLayer/Classes/DDoctorLogIn.cs']],'Postman: old fields unchanged + role_type, nurse_user_id, has_allocation_today.','P0-02',''],
+['P0-06','P0','Web','Keep role_type in the session; proxy skeleton',[['MOD',W+'Controllers/HomeController.cs (LoginSession: userInfo.RoleType)'],['NEW',W+'Controllers/NurseMobileProxyController.cs (cookie → Bearer relay, same pattern as FormInlineProxyController)']],'Login, dashboard and every menu behave exactly as before.','P0-05',''],
+['P0-07','P0','Mobile','Business errors never log the user out; base URL from config',[['MOD',M+'services/api.services.dart (status:false + code → ApiBusinessError; 401/403 only → session expired)'],['MOD',M+'core/utils/urls.dart (setBaseUrl enabled)'],['MOD',M+'features/auth/presentation/logic/auth_state_notifier.dart (:29 setBaseUrl)'],['MOD',M+'core/session/session.dart']],'Simulated status:false response shows a message and keeps the session.','P0-04',''],
+['P0-08','P0','Mobile','Route by role_type (fallback to the role-name match)',[['MOD',M+'features/auth/data/model/login.model.dart (roleType)'],['MOD',M+'features/auth/presentation/logic/login/login_state_notifier.dart (:80–87)'],['MOD',M+'features/auth/presentation/pages/index.dart (:152–163)'],['MOD',M+'features/splash/presentation/pages/index.dart (:51–57)'],['MOD',M+'services/cache.service.dart']],'Doctor, nurse and NS land on the same screens as today.','P0-05',''],
+['P0-09','P0','Ops','SQL Agent job database from config',[['MOD',A+'DoctorAPI/Scripts/SQL_Agent_Job_NursingRecurringTasks.sql (remove hard-coded hms241224)']],'Job runs on the configured DB in test.','',''],
+['P0-11','P0','QA','Clinical safety owner + clinical rules sign-off',[['NEW','DoctorApp/Docs/clinical/clinical-rules-signoff.md (default notify-if limits in hospital unit °F, hold-reason list, frequency → time master, PRN minimum interval + max doses / 24 h, allergy warn vs block rules, alert escalation times)'],['SQL',D+'05_clinical_rule_masters.sql (hold_reason_master, prn_rule defaults, alert_escalation_rule)']],'Signed by the medical superintendent and nursing superintendent before any P2 flag is switched on.','','',true],
+['P0-10','P0','QA','Contract tests + baseline regression',[['NEW','DoctorApp/Docs/qa/nursing-contract.postman_collection.json (old and new payloads per endpoint)'],['NEW','DoctorApp/Docs/qa/regression-checklist.md']],'Baseline run recorded; used at every phase exit.','',''],
+// ---------------- P1 ----------------
+['P1-01','P1','DB','fn_NurseCanAccessVisit (roster + LocationScope + cover)',[['SQL',D+'10_fn_NurseCanAccessVisit.sql (nursing_duty_roster wardid/current_wardid/effective_from-to, fn_LocationScopeWards, NursingDutyReassignment, is_incharge read-all)']],'Returns 1 only for allotted wards in the current shift; doctors/admin never evaluated.','P0-02',''],
+['P1-02','P1','DB','fn_DoctorCanAccessVisit (My Team logic)',[['SQL',D+'11_fn_DoctorCanAccessVisit.sql (IP: treating + referral/consulting + team as IpManagementV2 MyTeam; OP: appointment doctor)']],'Matches the "My Team Only" list for 5 sample doctors.','P0-02',''],
+['P1-03','P1','DB','Bed QR key + scan access log',[['SQL',D+'12_bed_qr_and_access_log.sql (bed_managemet_details.qr_key; nurse_bed_access_log)']],'Every bed has a qr_key; log table ready.','',''],
+['P1-04','P1','API','NurseMobile: MyAllocation, ScanBed, FloorCensus, Cover',[['NEW',A+'DoctorAPI/Controllers/NurseMobileController.cs'],['NEW',A+'Businesslayer/Classes/BNurseMobile.cs'],['NEW',A+'Businesslayer/Interfaces/IBNurseMobile.cs'],['NEW',A+'DataAccessLayer/Classes/DNurseMobile.cs'],['NEW',A+'EntityLayer/ClsNurseMobile.cs'],['SQL',D+'13_SP_NurseMobile_Allocation_Scan_Census_Cover.sql (cover = NursingDutyReassignment row)'],['MOD',A+'DoctorAPI/DoctorAPI.csproj · Businesslayer.csproj · DataAccessLayer.csproj · EntityLayer.csproj (include files)']],'2F bed → status:false NOT_ALLOCATED (HTTP 200); 3F bed → grant + patient; vacant / moved states.','P1-01,P1-03,P0-04',''],
+['P1-05','P1','DB','Apply the access check to nurse-facing SPs (nurse roles only)',[['SQL',D+'14_apply_nurse_scope.sql'],['SQL','SP_NursingTask_Ins_Upd_Del_Sel · SP_NurseConsolidatedBoard_Sel · SP_WardPatientSummary_Sel · SP_MedicationDeliverySchedule_Sel · SP_OPNurseQueue_Ins_Upd_Sel · DBScripts/NurseConsole/* (read + write)']],'Flag off → identical output; flag on → nurse sees allotted wards only; doctor unchanged.','P1-01','enforce_nurse_scope'],
+['P1-06','P1','Web','Bed QR label print page',[['NEW',W+'Views/NursingAutomation/BedQrLabels.cshtml'],['NEW',W+'Content/js/ApplicationJs/BedQrLabels.js'],['MOD',W+'Controllers/NursingAutomationController.Location.cs (BedQrLabels action → API)'],['SQL',D+'15_menu_bed_qr_labels.sql (forms_description + rights)']],'Print A4 sheet of labels for one ward; scanning a label resolves the right bed.','P1-03',''],
+['P1-07','P1','Web','Display board: login or per-kiosk device key',[['MOD',A+'DoctorAPI/Controllers/DisplayBoardController.cs · DisplayBoardController.Location.cs'],['MOD',W+'Controllers/DisplayBoardController.cs · DisplayBoardController.Location.cs'],['MOD',W+'Content/js/ApplicationJs/WardDisplayBoard.js · WardLocationBoard.js']],'Kiosk with key works; request without key or session rejected.','',''],
+['P1-08','P1','Mobile','Scanner package + camera permission',[['MOD','DoctorApp/pubspec.yaml (mobile_scanner)'],['MOD','DoctorApp/android/app/src/main/AndroidManifest.xml (CAMERA)'],['MOD','DoctorApp/ios/Runner/Info.plist (NSCameraUsageDescription)']],'Builds on Android + iOS; permission prompt shown once.','',''],
+['P1-09','P1','Mobile','Nurse mobile data layer',[['NEW',M+'features/nurse/data/datasource/nurse_mobile_remote_datasource.dart'],['NEW',M+'features/nurse/data/models/allocation_model.dart · scan_result_model.dart · floor_census_model.dart'],['NEW',M+'features/nurse/presentation/logic/nurse_mobile_providers.dart'],['MOD',M+'core/utils/urls.dart (NurseMobile endpoints)']],'Models parse sample responses (unit tests).','P1-04',''],
+['P1-10','P1','Mobile','Shift start, handover receive, scan, results, My Floors',[['NEW',M+'features/nurse/presentation/pages/nurse_shift_start_page.dart'],['NEW',M+'features/nurse/presentation/pages/nurse_handover_receive_page.dart'],['NEW',M+'features/nurse/presentation/pages/nurse_scan_page.dart'],['NEW',M+'features/nurse/presentation/pages/nurse_scan_result_page.dart (denied / vacant / moved)'],['NEW',M+'features/nurse/presentation/pages/nurse_cover_request_page.dart'],['NEW',M+'features/nurse/presentation/pages/nurse_floors_page.dart'],['NEW',M+'features/nurse_superintendent/presentation/pages/ns_cover_approval_page.dart'],['MOD',M+'features/nurse/presentation/pages/nurse_dashboard_page.dart (Scan FAB, bell, Quick Access, header from allocation)'],['MOD',M+'features/nurse/presentation/pages/nurse_profile_page.dart'],['MOD',M+'core/routes/router.dart (+ build_runner router.gr.dart)']],'Matches nurse prototype screens 1–15.','P1-09,P0-08',''],
+['P1-11','P1','QA','Pilot floor with enforce_nurse_scope ON',[['CFG','HmsFeatureFlag: enforce_nurse_scope = 1 for the pilot hospital/ward']],'Exit check for P1 passes.','P1-05,P1-10','enforce_nurse_scope'],
+// ---------------- P2 ----------------
+['P2-01','P2','DB','MAR canonical status + mapping shim',[['SQL',D+'20_mar_columns.sql (medication_delivery_schedule + hold_reason, partial_flag, late_flag, source)'],['SQL','SP_MedicationDelivery_StatusUpdate → writes via SP_NurseConsole_Administer_Ins_Upd (ADMINISTERED/DELIVERED→GIVEN, PARTIAL→GIVEN+partial, HELD→SKIPPED+hold_reason)'],['SQL','SP_MedicationDeliverySchedule_Sel (@vocab default legacy)']],'MedicationDelivery.js, NurseConsolePro.js, NurseWorklist.js show the same statuses as before.','',''],
+['P2-02','P2','API','Administer (ADM) mobile rules + identity',[['SQL','DBScripts/NurseConsole/17b · 17c SP_NurseConsole_Administer_Ins_Upd (@source, @access_grant; grant + reason required only for MOBILE)'],['MOD',A+'DoctorAPI/Controllers/NurseConsoleController.cs (NurseConsole_MAR)'],['MOD',A+'DataAccessLayer/Classes/DNurseConsole.cs (ADM params)'],['MOD',A+'EntityLayer/ClsNurseConsole_MAR.cs']],'Web ADM and RNDS unchanged; mobile without grant → status:false NO_GRANT.','P1-04,P0-03',''],
+['P2-03','P2','DB','PRN (SOS) administration',[['SQL','SP_NurseConsole_Administer_Ins_Upd (dose_id NULL + prescription_id → PRN row)'],['MOD',W+'Content/js/ApplicationJs/NurseConsole.js (show PRN rows in MAR day)']],'SOS paracetamol given on mobile appears once in web MAR day.','P2-02',''],
+['P2-04','P2','DB','GenerateDoses v2: times from frequency',[['SQL',D+'21_frequency_time_master.sql (Q6H, TDS pre-meal, OD-before-food …)'],['SQL','DBScripts/NurseConsole/16_ · 16b_ · 16c_ · 16d_ SP_NurseConsole_GenerateDoses* (flag mar_frequency_times)'],['MOD',W+'Content/js/ApplicationJs/NurseConsole.js (grid renders non-slot times)'],['MOD',W+'Views/IpmanagementNew/Partials/_NurseConsole_MARDayDrawer.cshtml · _NurseConsole_MARMedicineDrawer.cshtml']],'Flag off → 08/14/18/20 as today; on → q6h = 06/12/18/24.','P0-01','mar_frequency_times'],
+['P2-05','P2','DB','Auto-generate doses on IP prescription save only',[['SQL',D+'22_prescription_autogen.sql (SP_G_Medicine_Prescription_Ins_Upd_Del: IP visit, not discharge, idempotent)']],'OP case sheet, Dashboard, discharge, DoctorApp OP prescription create zero doses; doctor_prescription_new creates them once.','P0-01','mar_auto_generate'],
+['P2-06','P2','DB','Doses carry ward / branch / floor + backfill',[['SQL','DBScripts/NurseConsole/16c · 16d GenerateDoses (set wardid, branch_id, floorid from bed)'],['SQL',D+'23_mar_ward_backfill.sql']],'Medication Delivery page shows doses for the chosen ward.','',''],
+['P2-07','P2','DB','Nurse board SP fixes',[['SQL','SP_NurseConsolidatedBoard_Sel (night 22:00–05:59, done incl. canonical statuses, priority HIGH/MEDIUM/LOW, 11 params)']],'Counts match a manual count for one ward.','P2-01',''],
+['P2-08','P2','Web','OP allergy warning in the prescription pad',[['MOD',A+'DoctorAPI/Controllers/NurseConsoleController.cs (ALCK allowed for doctor role)'],['MOD',W+'Controllers/CaseStudyNewController.cs (AllergyCheck proxy action)'],['MOD',W+'Content/js/ApplicationJs/CaseStudyNew/casesheet-tab.js (add-medicine hook)'],['MOD',W+'Content/js/ApplicationJs/CaseStudy/casestudy_main.js (old case sheet)']],'Sulfa allergy + glimepiride → warning; other drugs unaffected.','',''],
+['P2-09','P2','Mobile','Nurse Medication on the nurse-console path + Administer screen',[['MOD',M+'features/nurse/presentation/pages/nurse_medication_page.dart'],['MOD',M+'features/nurse/data/datasource/nurse_remote_datasource.dart (MAR DAY / ADM, source=MOBILE, grant)'],['MOD',M+'features/nurse/data/models/nurse_medication_model.dart (canonical statuses, "Held" label)'],['NEW',M+'features/nurse/presentation/pages/nurse_administer_page.dart (five rights, site, batch, reason)']],'Dose given on mobile shows GIVEN in web nurse_console within one refresh.','P2-02',''],
+['P2-10','P2','Mobile','Doctor app: allergy check on OP prescription',[['MOD',M+'features/clinical_data/presentation/widgets/medicine_prescription_widget.dart'],['MOD',M+'features/clinical_data/data/data_sources/clinical_data_remote_datasource.dart']],'Same warning as web for the same patient and drug.','P2-08',''],
+['P2-12','P2','DB','Single-administration guard: one dose can be given only once',[['SQL',D+'24_mar_single_admin_guard.sql (client_request_id column + unique index; filtered unique index one GIVEN per dose_id)'],['SQL','DBScripts/NurseConsole/17b · 17c SP_NurseConsole_Administer_Ins_Upd (UPDATE … WITH (UPDLOCK, ROWLOCK) WHERE dose_id=@id AND status=\'PENDING\'; @@ROWCOUNT = 0 → status:false ALREADY_ADMINISTERED + who / when; same client_request_id → return the first result)'],['SQL','SP_MedicationDelivery_StatusUpdate shim + RNDS Med-Pass batch go through the same guarded statement'],['MOD',A+'DataAccessLayer/Classes/DNurseConsole.cs (client_request_id)'],['MOD',W+'Content/js/ApplicationJs/NurseConsole.js (show "Already given by … at …", refresh row)'],['MOD',M+'features/nurse/presentation/pages/nurse_administer_page.dart · data/datasource/nurse_remote_datasource.dart (UUID per attempt, handle ALREADY_ADMINISTERED)']],'Two saves of the same dose at the same moment (web + mobile) → exactly one GIVEN; the other sees who gave it and when; a network retry with the same request id does not create a second record. Administered time = server time.','P2-02','',true],
+['P2-13','P2','DB','PRN (SOS) safety limits',[['SQL','SP_NurseConsole_Administer_Ins_Upd (PRN: minimum interval + max doses / 24 h from prescription or prn_rule default)'],['MOD',W+'Content/js/ApplicationJs/NurseConsole.js (show last PRN given + next allowed time)'],['MOD',M+'features/nurse/presentation/pages/nurse_administer_page.dart (same info; blocked with reason)']],'Paracetamol SOS given at 08:05 → a second attempt before the minimum interval is blocked with last-given details; override only by doctor order.','P2-03,P0-11','',true],
+['P2-14','P2','DB','MAR audit trail (before / after, reason, server time)',[['SQL',D+'25_mar_audit.sql (medication_administration_audit: dose_id, prescription_id, action ADMINISTER / CORRECT / CANCEL / HOLD_DECISION, old_json, new_json, reason, by, source, server_at)'],['SQL','SP_NurseConsole_Administer_Ins_Upd · RGIV / RNDS cancel paths · SP_MedicationDelivery_StatusUpdate (write audit row; corrections need a reason; original kept)'],['SQL','NurseConsole_Prescription U / STOP (doctor held-dose decisions audited)'],['MOD',W+'Content/js/ApplicationJs/NurseConsole.js (reason prompt on correct / cancel of a GIVEN dose; history link)'],['MOD',W+'Views/IpmanagementNew/Partials/_NurseConsole_MARMedicineDrawer.cshtml (history panel)'],['MOD',M+'features/my-ip-patients/presentation/nursing/nursing_mar_page.dart (history per dose)']],'Every change to a dose or a doctor decision creates one audit row with before/after, user, source and server time; no silent overwrite; history visible to doctor and nurse.','P2-12','',true],
+['P2-11','P2','QA','MAR parity + no OP doses',[['CFG','Enable mar_auto_generate / mar_frequency_times on pilot']],'Exit check for P2 passes, including a concurrency test (100 simultaneous web + mobile saves on the same doses → zero duplicates).','P2-05,P2-09,P2-12,P2-13,P2-14,P0-11',''],
+// ---------------- P3 ----------------
+['P3-01','P3','DB','Charting columns + soft delete + temp unit',[['SQL',D+'30_charting_columns.sql (vitals grbs, o2_flow; is_deleted/deleted_by/delete_reason/source on vitals, fluids, notes, diabetic chart; notes note_category, reviewed_by/at, reply_to_note_id, order_ids; visit_report vitals_by/at)'],['SQL','SP_IP_Vitalsmonitoring_Ins_Upd_Del · SP_IP_Fluids_Ins_Upd_Del · SP_ip_nursing_notes_Ins_Upd · SP_IP_diabeticchart_Ins_Upd_Del (optional params, DEL → soft)']],'All existing callers pass unchanged; deleted rows hidden in lists.','',''],
+['P3-02','P3','API','Optional params + identity fallback for charting APIs',[['MOD',A+'DoctorAPI/Controllers/IpmanagementController.cs (Vitalsmonitoring :162, Diabeticchart :224, Fluids :287, NursingNotes :415)'],['MOD',A+'DataAccessLayer/Classes/DIpmanagement.cs'],['MOD',A+'EntityLayer/Clsvitalsmonitoring.cs · Clsfluids.cs · ClsNursingNotes.cs'],['MOD',A+'DoctorAPI/Controllers/NursingAutomationController.cs (IPVitalsMonitoring :2270)']],'25 web note screens + 12 app files work unchanged (contract tests).','P3-01,P0-03',''],
+['P3-03','P3','API','OP vitals → same visit vitals as Quick Entry',[['SQL','SP_OPVitalsEntry_NurseQueue (write visit_report vitals + vitals_by/at, blood_sugar_type)'],['MOD',A+'DataAccessLayer/Classes/DNursingAutomation.cs (:671 add @blood_sugar_type)'],['MOD',A+'DoctorAPI/Controllers/NursingAutomationController.cs (OPVitalsEntry :1202)'],['MOD',W+'Controllers/NursingAutomationController.cs (:522 nurse from UserId, not DoctorId)']],'Vitals entered in OP queue appear in CaseStudyNew Vitals and DoctorApp Vitals tab.','P3-01',''],
+['P3-04','P3','DB','Check-in → OP nurse queue; location filter',[['SQL','SP_D_Patient_checkin (insert op_nurse_queue, idempotent)'],['MOD',A+'DataAccessLayer/Classes/DNursingAutomation.cs (OPNurseQueue_Ins_Upd_Sel pass @P_LocationIds)']],'Web and PatientApp check-in unchanged; queue fills once.','P0-01','op_nurse_triage'],
+['P3-05','P3','Web','Case sheet: triage chip, Accept, Nurse Assessment section',[['SQL','SP_D_P_Casesheet_select (append result set: triage + assessment)'],['MOD',W+'Controllers/CaseStudyNewController.cs (GetVitalsData)'],['MOD',W+'Views/CaseStudyNew/Partials/_PatientHeader.cshtml (triage chip, nurse allergies)'],['NEW',W+'Views/CaseStudyNew/Partials/_NurseAssessment.cshtml'],['MOD',W+'Views/Shared/casesheetlayout_formbuilderNew.cshtml (CS_MENU_GROUPS: Nurse Assessment)'],['MOD',W+'Content/js/ApplicationJs/CaseStudyNew/casesheet-tab.js (Accept = reviewed)'],['SQL',D+'31_casesheet_nurse_assessment_config.sql (Casesheet_Configuration row)']],'Old /Casestudy/Indexformbuilder still loads; new section visible in CaseStudyNew.','P3-03',''],
+['P3-06','P3','Web','Dashboard triage status + Ready for Doctor',[['SQL','SP_G_Appointment_Request (append queue status, nurse, time, vitals, allergy)'],['MOD',W+'Content/js/ApplicationJs/DashBoard.js (Patient Details cell, Engage ▾ items ~1060–2110)'],['MOD',W+'Views/Dashboard/Index.cshtml (Ready for Doctor sub-tab)']],'Existing columns, buttons and statuses unchanged.','P3-04',''],
+['P3-07','P3','Web','WardWorkspace Quick Vitals fix',[['MOD',W+'Content/js/ApplicationJs/WardWorkspace.js (:340–377 URL + IP_SYSBp… fields)']],'Quick Vitals saves and appears in IP vitals list.','',''],
+['P3-08','P3','Mobile','Nurse bedside: hub, doctor summary, vitals, trend, I/O, notes + SBAR',[['NEW',M+'features/nurse/presentation/pages/nurse_patient_hub_page.dart'],['NEW',M+'features/nurse/presentation/pages/nurse_doctor_summary_page.dart'],['MOD',M+'features/my-ip-patients/presentation/emr/vitals-page.dart (GRBS, limits, toast bug)'],['MOD',M+'features/my-ip-patients/presentation/logic/common-ip-logic.dart (:120–240)'],['MOD',M+'features/my-ip-patients/presentation/emr/iv_fluids_page.dart (:78 await)'],['MOD',M+'features/my-ip-patients/presentation/emr/nursing-page.dart · addnotes.dart · logic/nursing_logic.dart (category, SBAR, "Yoga Notes" message)'],['MOD',A+'DoctorAPI/Controllers/NurseMobileController.cs (PatientSnapshot, DueList)']],'Matches nurse prototype hub, vitals, trend, I/O, notes.','P1-10,P3-02',''],
+['P3-09','P3','Mobile','Nurse OP triage',[['MOD',M+'features/nurse/presentation/pages/nurse_op_vitals_page.dart (sugar + type, assessment, range checks)'],['MOD',M+'features/nurse/data/models/op_queue_model.dart (visit_report_id, not appointmentid)'],['MOD',M+'features/nurse/presentation/pages/nurse_op_queue_page.dart (auto-added label)']],'Triage from the app reaches the doctor case sheet.','P3-03',''],
+['P3-10','P3','Mobile','Doctor app OP: triage on sheet, Clinical Data, Vitals, Observation, Visit History',[['MOD',M+'features/home/presentation/widget/schedule_card.dart (triage tag)'],['MOD',M+'features/home/presentation/widget/patient_sheet/patient_sheet.dart (allergy + triage)'],['MOD',M+'features/clinical_data/presentation/pages/index.dart (chips)'],['MOD',M+'features/clinical_data/presentation/widgets/vitals.dart (nurse strip + Accept)'],['MOD',M+'features/clinical_data/presentation/widgets/observation.dart (:123 allergies, nurse card)'],['MOD',M+'features/medicalRecord/presentation/pages/newindex.dart (by nurse, nurse triage per visit)']],'Matches doctor prototype OP screens 2–10.','P3-05',''],
+['P3-12','P3','DB','Charting corrections audited (vitals, I/O, notes, diabetic chart)',[['SQL',D+'32_charting_audit.sql (charting_audit: table, row_id, old_json, new_json, reason, by, server_at)'],['SQL','SP_IP_Vitalsmonitoring_Ins_Upd_Del · SP_IP_Fluids_Ins_Upd_Del · SP_ip_nursing_notes_Ins_Upd · SP_IP_diabeticchart_Ins_Upd_Del (edit / soft delete → audit row, reason required for delete)']],'Editing or deleting a vitals entry keeps the original value in the audit table with who, when and why.','P3-01','',true],
+['P3-11','P3','QA','Charting + OP parity',[['CFG','Enable op_nurse_triage on pilot']],'Exit check for P3 passes.','P3-10',''],
+// ---------------- P4 ----------------
+['P4-01','P4','DB','Diet consumption + nutrition assessment mirror',[['SQL',D+'40_ip_diet_consumption.sql · ip_nutrition_assessment'],['MOD',A+'DoctorAPI/Controllers/IpDietV2Controller.cs (MarkConsumption :995, SaveAssessment :1265; try/catch mirror)'],['MOD',A+'DataAccessLayer/Classes/DIpDietV2.cs']],'IpDietV2.js responses unchanged; mirror rows written.','',''],
+['P4-02','P4','DB','Doctor orders as nursing_task rows + acknowledgement',[['SQL',D+'41_nursing_task_doctor_order.sql (source, order_text, thresholds_json, ack_by, ack_at)'],['SQL','SP_NursingTask_Ins_Upd_Del_Sel (GENERATE_ORDER, ACK)'],['MOD',A+'DoctorAPI/Controllers/NurseMobileController.cs (DoctorOrders Ins/List/Ack/Complete)'],['MOD',W+'Views/Ipmanagement/IpManagementV2.cshtml (~2744 Create Nursing Task shows source)']],'Order appears on NurseConsolePro and the nurse app task list.','P0-04',''],
+['P4-03','P4','Ops','Overdue / recurring / deferred jobs; admission GENERATE idempotent',[['MOD',A+'DoctorAPI/Scripts/SQL_Agent_Job_NursingRecurringTasks.sql'],['SQL',D+'42_job_check_overdue.sql'],['SQL','SP_NursingTask_Ins_Upd_Del_Sel (GENERATE dedupe)']],'Admission creates tasks once (AdmitPatient.js:1066 + server call).','P0-09',''],
+['P4-04','P4','Web','Shift handover dual format + ACK in all 3 screens',[['SQL','SP_ShiftHandover_Ins_Upd_Sel (string or JSON, nurse ids, ACK, S_PENDING)'],['MOD',A+'DataAccessLayer/Classes/DNursingAutomation.cs'],['MOD',W+'Content/js/ApplicationJs/WardWorkspace.js (:423–444 JSON)'],['MOD',W+'Views/Ipmanagement/IpManagementV2.cshtml (Handover modal)'],['MOD',W+'Content/js/ApplicationJs/ReceptionConsole.js (verify S output)']],'All three screens save; patient notes kept; ack time correct.','',''],
+['P4-05','P4','API','Alerts: extend the nurse-console alert store + push via firebase_uid',[['SQL',D+'43_alert_store_extend.sql (target_user_id, target_role, alert_type, visit_reportid)'],['MOD','DBScripts/NurseConsole/* (ALRT / AACK SPs)'],['MOD',A+'DoctorAPI/Controllers/NurseMobileController.cs (NursingAlerts LIST / ACK)'],['NEW',A+'DoctorAPI/Helpers/FcmSender.cs (uses existing doctor_user firebase_uid)']],'Nurse console alerts unchanged; new alert types delivered by push.','P0-04',''],
+['P4-06','P4','DB','Nursing assessments',[['SQL',D+'44_nursing_assessment.sql + SP_NursingAssessment_Ins_Sel'],['MOD',A+'DoctorAPI/Controllers/NurseMobileController.cs (NursingAssessment)']],'Morse score saved; next-due task created.','P4-02',''],
+['P4-07','P4','Mobile','Nurse: nutrition, diet V2, assessments, tasks, handover, alerts',[['NEW',M+'features/nurse/presentation/pages/nurse_nutrition_page.dart'],['MOD',M+'features/nurse/presentation/pages/nurse_diet_page.dart (IpDietV2 source)'],['MOD',M+'features/nurse/data/models/nurse_diet_model.dart'],['NEW',M+'features/nurse/presentation/pages/nurse_assessment_page.dart (replaces mock my-ip-patients/presentation/emr/assess_assement_page.dart:172)'],['MOD',M+'features/nurse/presentation/pages/nurse_tasks_page.dart · nurse_task_detail_page.dart · nurse_task_complete_page.dart (vitals form, photo, error states)'],['NEW',M+'features/nurse/presentation/pages/nurse_handover_send_page.dart'],['NEW',M+'features/nurse/presentation/pages/nurse_alerts_page.dart'],['MOD',M+'core/notification/controller.dart (ESCALATION / ORDER_ACK / CRITICAL_VITAL)']],'Matches nurse prototype nutrition, assessments, tasks, handover, alerts.','P4-01,P4-05,P4-06',''],
+['P4-09','P4','Ops','Critical alert escalation (unacknowledged → duty doctor)',[['SQL',D+'45_job_alert_escalation.sql (critical vitals / held critical dose not acknowledged in 15 min → duty doctor + charge nurse; times from alert_escalation_rule)'],['MOD',A+'DoctorAPI/Helpers/FcmSender.cs (escalation push)']],'Unacknowledged critical temperature alert reaches the duty doctor at 15 min in test; every escalation logged.','P4-05,P0-11','',true],
+['P4-08','P4','QA','Nutrition, tasks, handover parity',[],'Exit check for P4 passes.','P4-07',''],
+// ---------------- P5 ----------------
+['P5-01','P5','API','NursingSummary, NursingTimeline, NursingEscalation',[['SQL',D+'50_SP_NursingSummary.sql · 51_SP_NursingTimeline.sql · 52_SP_NursingEscalation.sql'],['MOD',A+'DoctorAPI/Controllers/NurseMobileController.cs'],['MOD',A+'DataAccessLayer/Classes/DNurseMobile.cs']],'One call returns vitals, MAR, I/O, diet, notes, tasks, assessments, handover for a visit.','P4-08',''],
+['P5-02','P5','DB','Append nursing data to existing doctor reads',[['SQL','SP_AdmitPatient_Ins_Upd_Sel (IpManagementV2 list flags appended; TLD sections as Table22+)'],['SQL','DoctorPatientSummary / DSUM SP (nursing fields appended)'],['SQL','SP_discharge_summary_pdf (optional nursing-course section, off by default)']],'NewIPTimelineView.js Table1–21 unchanged; app ipPatientsProvider parses.','P5-01',''],
+['P5-03','P5','Web','IP EMR Nursing module + read-only MAR',[['NEW',W+'Views/IpmanagementNew/NursingSummary.cshtml · NursingHistory.cshtml'],['NEW',W+'Content/js/ApplicationJs/NursingSummary.js'],['MOD',W+'Controllers/NurseMobileProxyController.cs (Summary, Timeline, Escalation, Orders, Alerts)'],['MOD',W+'Views/IpmanagementNew/IpDetailsListV2.cshtml (header strip, updateEMRDisplayV2 badges)'],['MOD',W+'Views/IpmanagementNew/nurse_console.cshtml · Content/js/ApplicationJs/NurseConsole.js (?embed=mar&readonly=1)'],['SQL',D+'53_menu_nursing_doctor_view.sql (doctor_module_temp1 + forms_description + rights)']],'Doctor opens Nursing Summary without the nurse console.','P5-01,P0-06',''],
+['P5-04','P5','Web','IpManagementV2: chips, Orders & Escalations tab, Nursing Summary button',[['MOD',W+'Content/js/ApplicationJs/IpManagementV2.js (BuildPatientCardV2, _buildPrimaryButtons)'],['MOD',W+'Views/Ipmanagement/IpManagementV2.cshtml (new .v2-tab-btn)']],'Existing tabs, buttons and filters unchanged.','P5-02',''],
+['P5-05','P5','Web','Timeline + case sheet view sections',[['MOD',W+'Content/js/ApplicationJs/NewIPTimelineView.js · Views/Ipmanagement/NewIPTimelineView.cshtml'],['MOD',W+'Content/js/ApplicationJs/IPCaseSheetView.js']],'New sections render after existing ones.','P5-02',''],
+['P5-06','P5','Web','DoctorWorkspace NURSING column, priority, Quick Note orders, doctor bell',[['MOD',W+'Content/js/ApplicationJs/DoctorWorkspace.js (NURSING column, CalcPriority, Open Full EMR → IpDetailsListV2, Quick Note orders)'],['MOD',W+'Views/IpmanagementNew/DoctorWorkspace.cshtml'],['MOD',W+'Views/Shared/_Layout.cshtml (doctor bell)'],['NEW',W+'Content/js/ApplicationJs/DoctorAlerts.js']],'Nurse bell unchanged; doctor bell lists nursing alerts.','P5-01,P4-05',''],
+['P5-07','P5','Web','Doctor Notes: instructions to nursing, SBAR replies, ack column',[['MOD',W+'Content/js/ApplicationJs/Doctornotes.js · Views/Ipmanagement/Doctornotes.cshtml']],'Old note entry unchanged; ticked lines create orders.','P4-02',''],
+['P5-08','P5','Web','OP case sheet Nurse Orders section',[['NEW',W+'Views/CaseStudyNew/Partials/_NurseOrders.cshtml'],['MOD',W+'Views/Shared/casesheetlayout_formbuilderNew.cshtml (menu item)'],['MOD',W+'Content/js/ApplicationJs/DashBoard.js (Engage ▾ Nurse Orders)']],'Orders reach the OP nurse; status returns to the doctor.','P4-02',''],
+['P5-09','P5','API','Forms: [Authorize], identity fallback, access check, versioning, mobile handoff',[['MOD',A+'DoctorAPI/Controllers/Form_BuilderController.cs (GetWorkspace :700, GetHistory :717, GetFormEntries :738, GetPatientBasics :767, masterdata save)'],['MOD',W+'Controllers/HomeController.cs (MobileHandoff: one-time code → session cookie)'],['MOD',W+'Controllers/FormInlineHostController.cs (patient/visit/module query)'],['MOD',W+'App_Start/RouteConfig.cs']],'Web Forms Workspace (OP, IP, ER, unit) unchanged; PatientApp APP_GetForms untouched.','P1-02,P0-03',''],
+['P5-10','P5','Mobile','Doctor app IP: flags, Nursing Summary, records, day, MAR, diet, handover, orders, escalations, alerts',[['NEW',M+'features/my-ip-patients/presentation/nursing/nursing_summary_page.dart · nursing_records_page.dart · nursing_day_page.dart · nursing_mar_page.dart · nursing_diet_page.dart · nursing_handover_page.dart · doctor_orders_page.dart · nurse_escalations_page.dart'],['MOD',M+'features/my-ip-patients/presentation/emr/my-ip-pat.dart (chips, Escalated badge :868)'],['MOD',M+'features/my-ip-patients/presentation/emr/details_page.dart (routeMap :28, Nursing today card :154)'],['MOD',M+'features/my-ip-patients/presentation/emr/emr_consent_page.dart (_getRouteFromTabId :671, counts, Doctor Notes → ConsultantPage)'],['MOD',M+'features/my-ip-patients/presentation/consultant/consultant-page.dart (instructions, ack)'],['MOD',M+'features/home/presentation/pages/home.dart (bell, attention badge :436)'],['NEW',M+'features/home/presentation/pages/doctor_alerts_page.dart'],['MOD',M+'features/home/presentation/pages/newindex.dart (:577 ALERTS route)']],'Matches doctor prototype IP screens.','P5-01',''],
+['P5-11','P5','Mobile','Doctor app OP: 07 Case sheet, Nurse Orders, OP nursing records',[['MOD',M+'features/clinical_data/presentation/pages/index.dart (GridCard 06 Nurse Orders, 07 Case sheet)'],['NEW',M+'features/clinical_data/presentation/pages/nurse_orders_page.dart'],['NEW',M+'features/clinical_data/presentation/pages/op_nursing_records_page.dart']],'Matches doctor prototype OP screens.','P5-08',''],
+['P5-12','P5','Mobile','Forms Workspace (doctor + nurse, OP + IP)',[['NEW',M+'features/forms_workspace/data/forms_remote_datasource.dart · models/'],['NEW',M+'features/forms_workspace/presentation/forms_workspace_page.dart · form_view_page.dart'],['MOD',M+'features/my-ip-patients/presentation/emr/form_index.dart (handoff URL to /forminline/form/{id})'],['MOD',M+'core/utils/urls.dart (new form URL builder; getFormUrl kept)'],['MOD',M+'features/my-ip-patients/presentation/widgets/forms/forms_page.dart (→ workspace)']],'Same form, same version on web and mobile; cross-role edit creates v+1.','P5-09',''],
+['P5-13','P5','QA','Doctor sees every nurse record; forms parity',[],'Exit check for P5 passes.','P5-12',''],
+// ---------------- P6 ----------------
+['P6-01','P6','Ops','Flags on: pilot floor → all floors',[['CFG','HmsFeatureFlag rows per ward / hospital']],'Flag change log recorded.','P5-13',''],
+['P6-02','P6','Ops','Kiosks keyed; bed labels printed and fixed',[['CFG','Display board device keys'],['CFG','Bed QR labels per ward (P1-06 page)']],'All boards online; every bed scans.','P1-06,P1-07',''],
+['P6-03','P6','Ops','Training: nurses, charge nurses, doctors',[['NEW','DoctorApp/Docs/training/nurse-quick-guide.pdf · doctor-quick-guide.pdf']],'Every pilot nurse completed a scan + MAR round.','',''],
+['P6-04','P6','Mobile','Store release + force update for the token change',[['MOD','DoctorApp/pubspec.yaml (version)'],['CFG','Play Console / App Store release; min-version gate']],'All active devices on the new build.','P0-03',''],
+['P6-05','P6','Ops','Monitoring: API errors, denial codes, alert volume',[['NEW','Dashboard / log queries for status:false codes, alert counts, ADM latency']],'Daily report during the pilot.','',''],
+['P6-07','P6','QA','Clinical safety review of the pilot',[['NEW','DoctorApp/Docs/clinical/pilot-safety-review.md (blocked double administrations, PRN blocks, alert escalations, near misses, actions)']],'Reviewed and signed by the medical and nursing superintendents; zero unresolved safety incidents.','P6-01','',true],
+['P6-06','P6','QA','Two-week pilot sign-off → hospital-wide',[],'No Sev-1 for two weeks and P6-07 signed.','P6-01,P6-05,P6-07','']
+];
+
+/* ============================ STATE ============================ */
+const LS='hmsNursingTracker.local.v1';
+let committed={startDate:START,updated:null,tasks:{}};
+let local={};
+try{local=JSON.parse(localStorage.getItem(LS)||'{}')||{}}catch(e){local={}}
+function st(id){return (local[id]||committed.tasks[id]||{status:'todo',note:''})}
+function saveLocal(){try{localStorage.setItem(LS,JSON.stringify(local))}catch(e){} }
+const $=s=>document.querySelector(s);
+let tt;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2200)}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============================ RENDER ============================ */
+const PC={P0:'var(--p0)',P1:'var(--p1)',P2:'var(--p2)',P3:'var(--p3)',P4:'var(--p4)',P5:'var(--p5)',P6:'var(--p6)'};
+function weekNow(){const s=new Date((committed.startDate||START)+'T00:00:00');const d=(Date.now()-s)/864e5;return d<0?0:Math.floor(d/7)+1}
+function phaseStats(pid){const ts=T.filter(t=>t[1]===pid);const d=ts.filter(t=>st(t[0]).status==='done').length,p=ts.filter(t=>st(t[0]).status==='doing').length;return {n:ts.length,d,p}}
+function renderKpis(){
+ const d=T.filter(t=>st(t[0]).status==='done').length,p=T.filter(t=>st(t[0]).status==='doing').length;
+ $('#kDone').textContent=d;$('#kProg').textContent=p;$('#kTotal').textContent=T.length;
+ const pct=Math.round(100*d/T.length);$('#kPct').textContent=pct+'%';$('#kBarD').style.width=(100*d/T.length)+'%';$('#kBarP').style.width=(100*p/T.length)+'%';
+ const files=new Set();T.forEach(t=>t[4].forEach(f=>files.add(f[1])));$('#kFiles').textContent=files.size;
+ const w=weekNow();$('#kWeek').textContent=w===0?'Not started':w>10?'Done (10)':'Week '+w;
+ $('#localText').textContent=Object.keys(local).length?`· ${Object.keys(local).length} local edit(s) not yet committed`:'';
+}
+function renderTimeline(){
+ const s=new Date((committed.startDate||START)+'T00:00:00');
+ let h='<div></div>'+Array.from({length:10},(_,i)=>{const d=new Date(s.getTime()+i*7*864e5);return `<div class="wk"><b>W${i+1}</b>${d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'})}</div>`}).join('');
+ PHASES.forEach(p=>{const x=phaseStats(p.id);const pct=x.n?Math.round(100*x.d/x.n):0;
+  h+=`<div class="ph">${p.id} · ${p.name}<span>${x.d}/${x.n}</span></div>`;
+  h+=`<div class="gbar" style="grid-column:${p.weeks[0]+1} / ${p.weeks[1]+2};background:${PC[p.id]}" title="${p.name}: ${pct}% finished"><div class="fill" style="width:${pct}%"></div><span>${pct}%</span></div>`;
+  for(let i=1;i<=10;i++){ if(i<p.weeks[0]||i>p.weeks[1]) h+=`<div style="grid-column:${i+1}"></div>`; }
+ });
+ $('#timeline').innerHTML=h;
+ const w=(Date.now()-s)/864e5/7; const tl=$('#timeline');
+ if(w>=0&&w<=10){const lab=190,tot=tl.scrollWidth;const x=lab+(tot-lab)*(w/10);const m=document.createElement('div');m.className='today';m.style.left=x+'px';tl.appendChild(m)}
+}
+function fileList(fs){return fs.length?`<ul class="files">${fs.map(f=>`<li><span class="fk ${f[0]}">${f[0]}</span><span>${esc(f[1])}</span></li>`).join('')}</ul>`:'<span class="dep">No file changes (verification task)</span>'}
+function renderPhases(){
+ const fsafe=$('#fSafety').value,fp=$('#fPhase').value,fl=$('#fLayer').value,fs=$('#fStatus').value,q=$('#fSearch').value.trim().toLowerCase();let shown=0;
+ const open={};document.querySelectorAll('details.phase').forEach(d=>open[d.dataset.p]=d.open);
+ $('#phases').innerHTML=PHASES.filter(p=>fp==='all'||p.id===fp).map(p=>{
+  const ts=T.filter(t=>t[1]===p.id).filter(t=>(fsafe==='all'||t[8])&&(fl==='all'||t[2]===fl)&&(fs==='all'||st(t[0]).status===fs)&&(!q||(t[0]+' '+t[3]+' '+t[4].map(f=>f[1]).join(' ')).toLowerCase().includes(q)));
+  shown+=ts.length;const x=phaseStats(p.id);const pct=x.n?Math.round(100*x.d/x.n):0;
+  const isOpen=open[p.id]!==undefined?open[p.id]:(q||fl!=='all'||fs!=='all'||fp!=='all'||fsafe!=='all'||weekNow()>=p.weeks[0]&&weekNow()<=p.weeks[1]);
+  return `<details class="phase" data-p="${p.id}" ${isOpen?'open':''}><summary><span class="pbadge" style="background:${PC[p.id]}">${p.id}</span>
+   <div class="pt"><b>${p.name} ${pct===100?'<span class="fin">✅ FINISHED</span>':''}</b><span>Weeks ${p.weeks[0]}${p.weeks[1]!==p.weeks[0]?'–'+p.weeks[1]:''} · ${p.goal}</span></div>
+   <div class="pp"><span>${x.d} of ${x.n} finished${x.p?` · ${x.p} in progress`:''}</span><div class="bar"><i class="d" style="width:${100*x.d/x.n}%"></i><i class="p" style="width:${100*x.p/x.n}%"></i></div></div></summary>
+   <div class="exit"><b>Exit check:</b> ${p.exit}</div>
+   ${ts.map(t=>{const s=st(t[0]);return `<div class="task ${s.status==='done'?'done':''}">
+     <span class="id">${t[0]}</span>
+     <div class="ti"><b>${esc(t[3])}</b><div class="meta"><span class="lay ${t[2]}">${t[2]}</span>${t[8]?'<span class="lay" style="background:#fbe5e3;color:#b3261e">Patient safety</span>':''}${t[7]?`<span class="flag">flag: ${t[7]}</span>`:''}${t[6]?`<span class="dep">after ${t[6].split(',').join(', ')}</span>`:''}<span class="dep">${t[4].length} file${t[4].length===1?'':'s'}</span></div>
+      <details ${q?'open':''}><summary>Files &amp; acceptance</summary>${fileList(t[4])}<div class="acc" style="margin-top:6px"><b>Acceptance:</b> ${esc(t[5])}</div></details></div>
+     <div class="st"><label class="hidden" for="s-${t[0]}">Status for ${t[0]}</label><select id="s-${t[0]}" data-id="${t[0]}"><option value="todo" ${s.status==='todo'?'selected':''}>Not started</option><option value="doing" ${s.status==='doing'?'selected':''}>In progress</option><option value="done" ${s.status==='done'?'selected':''}>Finished</option></select>
+      ${s.status==='done'?'<span class="fin">✅ FINISHED</span>':s.status==='doing'?'<span class="inprog">In progress</span>':''}
+      <input aria-label="Note for ${t[0]}" data-note="${t[0]}" value="${esc(s.note||'')}" placeholder="PR / commit / note" style="font:500 12px var(--sans);padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100%">
+      ${s.updated?`<span class="note">updated ${esc(s.updated)}${s.by?' · '+esc(s.by):''}</span>`:''}</div></div>`}).join('')||'<div class="task"><span></span><span class="dep">No tasks match the filters.</span></div>'}
+  </details>`}).join('');
+ $('#fCount').textContent=`${shown} task${shown===1?'':'s'} shown`;
+ document.querySelectorAll('select[data-id]').forEach(el=>el.addEventListener('change',e=>{const id=e.target.dataset.id;local[id]={...st(id),status:e.target.value,updated:new Date().toISOString().slice(0,16).replace('T',' ')};saveLocal();renderAll();toast(id+' → '+e.target.options[e.target.selectedIndex].text+' (download the status file to share)')}));
+ document.querySelectorAll('input[data-note]').forEach(el=>el.addEventListener('change',e=>{const id=e.target.dataset.note;local[id]={...st(id),note:e.target.value};saveLocal();renderKpis()}));
+}
+function renderAll(){renderKpis();renderTimeline();renderPhases()}
+$('#fPhase').innerHTML+=PHASES.map(p=>`<option value="${p.id}">${p.id} · ${p.name}</option>`).join('');
+['#fPhase','#fLayer','#fStatus','#fSafety'].forEach(s=>$(s).addEventListener('change',renderPhases));
+$('#fSearch').addEventListener('input',renderPhases);
+
+/* ============================ LIVE SYNC ============================ */
+async function sync(manual){
+ if(!/^https?:/.test(location.protocol)){ $('#syncText').textContent='Opened as a local file: showing the plan with this browser\'s edits. Live status works when served (GitHub Pages).'; renderAll(); return; }
+ try{const r=await fetch('tracker-status.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error(r.status);const j=await r.json();
+  committed={startDate:j.startDate||START,updated:j.updated||null,tasks:j.tasks||{}};
+  // drop local edits that the committed file already contains
+  Object.keys(local).forEach(id=>{const c=committed.tasks[id];if(c&&c.status===local[id].status&&(c.note||'')===(local[id].note||''))delete local[id]});saveLocal();
+  $('#syncDot').classList.add('live');$('#syncText').textContent=`Live · status file updated ${committed.updated||'—'} · checked ${new Date().toLocaleTimeString()}`;if(manual)toast('Status refreshed');
+ }catch(e){$('#syncDot').classList.remove('live');$('#syncText').textContent='Could not read tracker-status.json. Showing this browser\'s view.'}
+ renderAll();
+}
+function exportObj(){const tasks={};T.forEach(t=>{const s=st(t[0]);if(s.status!=='todo'||s.note)tasks[t[0]]={status:s.status,note:s.note||'',updated:s.updated||'',by:s.by||''}});return {startDate:committed.startDate||START,updated:new Date().toISOString().slice(0,16).replace('T',' '),tasks}}
+$('#btnExport').addEventListener('click',()=>{const b=new Blob([JSON.stringify(exportObj(),null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='tracker-status.json';document.body.appendChild(a);a.click();a.remove();toast('Downloaded. Commit it next to this page.')});
+$('#btnCopy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(JSON.stringify(exportObj(),null,2));toast('Status JSON copied')}catch(e){toast('Copy failed. Use Download instead.')}});
+$('#btnClear').addEventListener('click',()=>{local={};saveLocal();renderAll();toast('Local edits discarded')});
+$('#btnRefresh').addEventListener('click',()=>sync(true));
+sync(false);setInterval(()=>{if(document.visibilityState==='visible')sync(false)},60000);
+window.addEventListener('resize',renderTimeline);
+</script>
+</body>
+</html>
